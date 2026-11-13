@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Paridade C# x extensão (JS): lê tests/parity/cases.json. Rodar: dotnet test tests/SharkBlocker.ParityTests -->
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <!-- Só o projeto de teste: roda no runtime .NET mais novo instalado (ex.: PC só com o 10), sem exigir o 8. -->
+    <RollForward>LatestMajor</RollForward>
+    <!-- O App é self-contained; sem isto o SDK recusa a referência (NETSDK1150/1151). -->
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
+    <PackageReference Include="xunit" Version="2.7.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\App\App.csproj" />
+    <!-- TermLists procura "BrowserExtension" ao lado do executável de teste. -->
+    <None Include="..\..\BrowserExtension\*.js" Link="BrowserExtension\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\parity\cases.json" Link="parity\cases.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+# Compilação
+bin/
+obj/
+.vs/
+*.user
+publish/
+# CHAVE PRIVADA da extensão: nunca vai para o repositório (guarde uma cópia fora dele).
+ExtensionSigningKey/*.pem
+*.pem
+# Artefatos
+*.crx
+*.log

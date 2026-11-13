@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms> <!-- só pra NotifyIcon (ícone da bandeja) -->
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>SharkBlocker</AssemblyName>
+    <ApplicationIcon>Assets\sharkblocker.ico</ApplicationIcon>
+    <Product>SharkBlocker</Product>
+    <AssemblyTitle>SharkBlocker</AssemblyTitle>
+    <RootNamespace>SharkBlocker</RootNamespace>
+
+    <!-- Self-contained: empacota o próprio .NET Runtime junto, então quem
+         for rodar o .exe NÃO precisa instalar o .NET separadamente (era isso
+         que causava aquele aviso "instale o .NET" que você viu). Só tem
+         efeito com "dotnet publish" (não com "dotnet build") — ver README. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- Publica só os recursos de idioma pt-BR (some ~13 pastas de tradução do WPF/WinForms: cs, de, es, fr, it, ja, ko, pl, ru, tr, zh-*). -->
+    <SatelliteResourceLanguages>pt-BR</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Imagens e ícone do app. Embutidos no .exe. -->
+    <Resource Include="Assets\*.png;Assets\*.jpg;Assets\*.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <!-- Mutex com DACL explícita (ProcessSync) para sincronização entre o App (sessão do usuário
+         logado) e o Watchdog (sessão 0, conta SYSTEM). O Named Pipe usa a mesma DACL, mas via
+         P/Invoke direto (ConvertStringSecurityDescriptorToSecurityDescriptor + CreateNamedPipe) em
+         vez do pacote System.IO.Pipes.AccessControl — aquele pacote parou de publicar versões
+         estáveis depois da 5.0.0 e falha ao restaurar pedindo >= 8.0.0 (erro NU1102 visto em
+         produção); P/Invoke evita depender da disponibilidade dele no NuGet. -->
+    <PackageReference Include="System.Threading.AccessControl" Version="8.0.0" />
+    <!-- Detector de imagens (ImageGuard/NsfwClassifier): roda o modelo ONNX no PC. Só o App usa; o Watchdog não. -->
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.18.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Modelo do detector (model.onnx + model.json em App\Assets\nsfw\). Sem os arquivos, o detector fica "Sem modelo". -->
+    <Content Include="Assets\nsfw\*.onnx;Assets\nsfw\*.json" CopyToOutputDirectory="PreserveNewest" Link="nsfw\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

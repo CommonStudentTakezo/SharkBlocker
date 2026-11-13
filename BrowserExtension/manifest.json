@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "SharkBlocker - Bloqueio por Palavra-chave",
+  "version": "1.16",
+  "description": "Bloqueia sites e palavras-chave (incluindo conteúdo adulto) e reforça o SafeSearch, conforme o app SharkBlocker.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhzd/rp//J2CSfg0zOeN4nwa6riP7du842Vu8EnRxNyBhiWRMP1JRimrFq2bdIW2GGrcaOgW0J6gxljIPVOPAZ/L+KRBqt6jpUyqSXnd0eM2Ik/wJEcvL6eSewUjSN7DN+lPptU0kIGoXYwPLoJQN0s6qtTYBPFYtWtdQ3SOTibopwTLk3x6uCcQFDWNDLUz5BvtAOcrppPI60d0X1xduk/sjrvVazIx96j+0ugEZARLiQ4hY1xlpMnD3oSr9wnhhuVow2/jGrB0SMtkiqyndT/ZK6DjrkIo8vY0hqFw3QFckwUqmWmKqKaI3hi9ANwlU7kI4yXfgMqg1UjXIb8fVAwIDAQAB",
+  "permissions": [
+    "tabs",
+    "webNavigation",
+    "scripting",
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*",
+    "http://127.0.0.1:57411/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "deobf.js",
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "blocked.html",
+        "mascot.png",
+        "shark.png",
+        "blocked-bg.jpg"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

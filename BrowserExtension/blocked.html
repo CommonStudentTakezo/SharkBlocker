@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso bloqueado · SharkBlocker</title>
+    <style>
+        :root {
+            --bg: #0d0b12;
+            --surface: #16121d;
+            --border: #3b2e49;
+            --text: #f5eef7;
+            --muted: #a89cb6;
+            --crimson: #e0264d;
+            --pink: #ff6b8e;
+            --ice: #9edbf0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(rgba(13,11,18,.86), rgba(13,11,18,.92)), url('blocked-bg.jpg') center / cover no-repeat fixed, var(--bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 620px;
+            width: 100%;
+            background: var(--surface);
+            border: 1px solid var(--crimson);
+            border-radius: 18px;
+            padding: 36px 36px 28px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(224, 38, 77, 0.28);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .mascot {
+            width: 110px;
+            height: auto;
+            margin-bottom: 8px;
+            animation: bob 1.8s ease-in-out infinite;
+        }
+
+        @keyframes bob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--pink);
+            margin-bottom: 14px;
+        }
+
+        .reason {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--ice);
+            margin-bottom: 18px;
+        }
+
+        .message {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--muted);
+            margin-bottom: 26px;
+        }
+
+        .timer-container {
+            margin: 0 0 22px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .timer-label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .timer {
+            font-size: 64px;
+            font-weight: 800;
+            color: #ffd1dc;
+            font-family: Consolas, 'Courier New', monospace;
+            letter-spacing: 4px;
+        }
+
+        .warning {
+            padding: 12px 14px;
+            background: rgba(224, 38, 77, 0.14);
+            border-radius: 10px;
+            font-size: 13.5px;
+            color: var(--pink);
+        }
+
+        .info {
+            margin-top: 22px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .info p { margin-bottom: 4px; }
+
+        .activity-log {
+            margin-top: 14px;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--muted);
+            max-height: 90px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .log-entry {
+            margin: 3px 0;
+            padding-left: 10px;
+            border-left: 2px solid var(--crimson);
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 26px 18px; }
+            .timer { font-size: 48px; }
+            h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img class="mascot" src="shark.png" alt="SharkBlocker">
+
+        <h1>Acesso bloqueado</h1>
+
+        <div class="reason" id="reason">Você tentou acessar conteúdo restrito</div>
+
+        <div class="message">
+            <p>Esta ação foi detectada e bloqueada pelo SharkBlocker.</p>
+        </div>
+
+        <div class="timer-container">
+            <div class="timer-label">Esta página fecha em</div>
+            <div class="timer" id="timer">5:00</div>
+        </div>
+
+        <div class="warning">Ellen is watching. Esse bloqueio não tem como ser contornado por aqui.</div>
+
+        <div class="info">
+            <p id="timestamp"></p>
+            <p id="details"></p>
+        </div>
+
+        <div class="activity-log" id="log">
+            <div class="log-entry">Bloqueio ativado às <span id="time"></span></div>
+        </div>
+    </div>
+
+    <script src="blocked.js"></script>
+</body>
+</html>

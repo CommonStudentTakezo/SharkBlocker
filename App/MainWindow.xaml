@@ -1,0 +1,540 @@
+<Window x:Class="SharkBlocker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:SharkBlocker.Controls"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="SharkBlocker" Height="760" Width="840"
+        MinHeight="560" MinWidth="660"
+        Icon="/Assets/sharkblocker.ico"
+        Foreground="{StaticResource ColorTextPrimary}"
+        FontFamily="{StaticResource UiFont}" FontSize="13"
+        UseLayoutRounding="True" SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Ideal"
+        WindowStartupLocation="CenterScreen" Closing="Window_Closing" StateChanged="Window_StateChanged">
+
+    <!-- Barra de título própria (escura), no estilo dos launchers: o Windows deixa de desenhar a
+         barra branca e a nossa faz o papel de arrastar, maximizar com duplo clique e redimensionar. -->
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="40" ResizeBorderThickness="6" GlassFrameThickness="1"
+                            CornerRadius="0" UseAeroCaptionButtons="False"/>
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <Style x:Key="CaptionButton" TargetType="Button">
+            <Setter Property="Width" Value="46"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Foreground" Value="{StaticResource ColorTextSecondary}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}">
+                            <TextBlock Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="10"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#22FFFFFF"/>
+                                <Setter Property="Foreground" Value="{StaticResource ColorTextPrimary}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#33FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CaptionCloseButton" TargetType="Button" BasedOn="{StaticResource CaptionButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bg" Background="{TemplateBinding Background}">
+                            <TextBlock x:Name="Glyph" Text="{TemplateBinding Tag}" FontFamily="{StaticResource IconFont}" FontSize="10"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#E81123"/>
+                                <Setter TargetName="Glyph" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bg" Property="Background" Value="#B80E1C"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <!-- Entrada da janela: o conteúdo aparece com fade e sobe um pouquinho. -->
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetName="RootGrid" Storyboard.TargetProperty="Opacity"
+                                     From="0" To="1" Duration="0:0:0.35"/>
+                    <DoubleAnimation Storyboard.TargetName="RootShift" Storyboard.TargetProperty="Y"
+                                     From="14" To="0" Duration="0:0:0.45">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
+
+    <!-- Fundo: degradê VETORIAL (não tem pixels, então nunca fica serrilhado, em qualquer tamanho)
+         + a arte da personagem como imagem SEPARADA em tamanho NATIVO (320x625, sem ampliar:
+         StretchDirection="DownOnly" só reduz se a janela ficar pequena). Fica numa camada atrás do
+         layout (não está dentro dele), então NÃO influencia o tamanho dos controles. -->
+    <Window.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#0E0D13" Offset="0"/>
+            <GradientStop Color="#120F17" Offset="0.55"/>
+            <GradientStop Color="#2A0F1D" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Grid x:Name="OuterGrid" RenderOptions.BitmapScalingMode="HighQuality">
+        <!-- brilho vinho atrás da personagem -->
+        <Ellipse Width="620" Height="760" HorizontalAlignment="Right" VerticalAlignment="Center"
+                 Margin="0,0,-190,0" IsHitTestVisible="False">
+            <Ellipse.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#3D5A1432" Offset="0"/>
+                    <GradientStop Color="#26461026" Offset="0.45"/>
+                    <GradientStop Color="#00461026" Offset="1"/>
+                </RadialGradientBrush>
+            </Ellipse.Fill>
+        </Ellipse>
+        <Image Source="/Assets/bg-character.png" Stretch="Uniform" StretchDirection="DownOnly"
+               HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,16,0"
+               Opacity="0.55" IsHitTestVisible="False"/>
+
+        <Grid x:Name="RootGrid" Margin="0,40,0,0">
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="RootShift" Y="0"/>
+            </Grid.RenderTransform>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- ===================== CABEÇALHO ===================== -->
+            <Border Grid.Row="0" Height="76" Background="{StaticResource HeaderGradient}" Opacity="0.96"
+                    BorderBrush="{StaticResource ColorBorder}" BorderThickness="0,0,0,1">
+                <Grid Margin="24,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Width="46" Height="46" CornerRadius="13" Margin="0,0,14,0" VerticalAlignment="Center"
+                            Background="{StaticResource ColorSurface}" BorderBrush="{StaticResource ColorBorderStrong}"
+                            BorderThickness="1">
+                        <Image Source="/Assets/shark-glyph.png" Width="32" Height="32"/>
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="SharkBlocker" Style="{StaticResource TitleLarge}"/>
+                        <TextBlock Text="Ellen is watching" Foreground="{StaticResource ColorAccent}"
+                                   FontSize="12.5" FontWeight="SemiBold" Margin="0,1,0,0"/>
+                    </StackPanel>
+
+                    <!-- Saúde das proteções, em "pílula" -->
+                    <Border Grid.Column="2" VerticalAlignment="Center" CornerRadius="14" Padding="12,5"
+                            Background="#14FFFFFF" BorderBrush="{StaticResource ColorBorder}" BorderThickness="1">
+                        <TextBlock x:Name="HealthText" Text="Verificando proteções..." FontSize="12"
+                                   FontWeight="SemiBold" Foreground="{StaticResource ColorTextMuted}"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- Faixa de status: sempre visível, em qualquer aba -->
+            <Border x:Name="StatusBanner" Grid.Row="1" Margin="24,16,24,6" Padding="14,12" CornerRadius="12"
+                    Background="{StaticResource ColorSurfaceAlt}"
+                    BorderBrush="{StaticResource ColorBorder}" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="36" Height="36" CornerRadius="10" Margin="0,0,14,0" Background="#1FFFFFFF">
+                        <Grid>
+                            <Image x:Name="StatusSharkIcon" Source="/Assets/shark-glyph.png" Width="22" Height="22"/>
+                            <TextBlock x:Name="StatusIcon" Text="&#xE72E;" FontFamily="{StaticResource IconFont}"
+                                       FontSize="17" Visibility="Collapsed"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                    <TextBlock x:Name="StatusText" Grid.Column="1" TextWrapping="Wrap" FontWeight="SemiBold"
+                               FontSize="13.5" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+
+            <TabControl x:Name="MainTabs" Grid.Row="2" SelectionChanged="MainTabs_SelectionChanged">
+
+                <!-- ===================== ABA: BLOQUEIO ===================== -->
+                <TabItem Header="Bloqueio">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24,18,24,24">
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock x:Name="SitesHeader" Text="Sites bloqueados" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Text="Um por linha. Pode colar o endereço inteiro (https://youtube.com/watch...): eu guardo só o domínio."
+                                               Style="{StaticResource HelpText}" Margin="0,0,0,10"/>
+                                    <TextBox x:Name="SitesBox" AcceptsReturn="True" TextWrapping="Wrap"
+                                             VerticalScrollBarVisibility="Auto" Height="92"/>
+                                    <WrapPanel Margin="0,12,0,0">
+                                        <Button x:Name="ImportListButton" Content="Importar lista (hosts)" Margin="0,0,8,0" Click="ImportListButton_Click"/>
+                                        <Button x:Name="RemoveImportedButton" Content="Remover importada" Click="RemoveImportedButton_Click"/>
+                                    </WrapPanel>
+                                    <TextBlock x:Name="ImportedListLabelText" Style="{StaticResource HelpText}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock x:Name="KeywordsHeader" Text="Palavras-chave bloqueadas" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Text="Exemplo: poker, apostas. Precisa da extensão no navegador (veja a aba Status)."
+                                               Style="{StaticResource HelpText}" Margin="0,0,0,10"/>
+                                    <TextBox x:Name="KeywordsBox" AcceptsReturn="True" TextWrapping="Wrap"
+                                             VerticalScrollBarVisibility="Auto" Height="76"/>
+                                    <Button x:Name="SuggestAdultKeywordsButton" Content="Sugerir termos de conteúdo adulto (cobre lojas como Amazon/Kindle)"
+                                            HorizontalAlignment="Left" Margin="0,12,0,0" Click="SuggestAdultKeywordsButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock x:Name="AppsHeader" Text="Programas bloqueados" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Text="Nome do processo, sem .exe. Exemplo: steam, discord" Style="{StaticResource HelpText}" Margin="0,0,0,10"/>
+                                    <TextBox x:Name="AppsBox" AcceptsReturn="True" TextWrapping="Wrap"
+                                             VerticalScrollBarVisibility="Auto" Height="76"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Expander Header="Avançado: navegadores que burlam bloqueios" Margin="0,0,0,12">
+                                <Border Style="{StaticResource Card}" Margin="0">
+                                    <StackPanel>
+                                        <TextBlock Text="Trechos de caminho (ex: tor browser, duckduckgo)" Style="{StaticResource SectionHeader}"/>
+                                        <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,10"
+                                                   Text="Qualquer programa cujo caminho contenha um desses trechos é encerrado durante o bloqueio."/>
+                                        <TextBox x:Name="PathKeywordsBox" AcceptsReturn="True" TextWrapping="Wrap"
+                                                 VerticalScrollBarVisibility="Auto" Height="60"/>
+                                        <Button x:Name="SuggestBrowsersButton" Content="Sugerir navegadores conhecidos"
+                                                HorizontalAlignment="Left" Margin="0,12,0,0" Click="SuggestBrowsersButton_Click"/>
+                                    </StackPanel>
+                                </Border>
+                            </Expander>
+
+                            <Expander Header="Backup das listas (exportar / importar)" Margin="0,0,0,14">
+                                <Border Style="{StaticResource Card}" Margin="0">
+                                    <StackPanel>
+                                        <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                                   Text="Guarda as listas de cima num arquivo .json, ou carrega de um. Importar só preenche as caixas (somando ao que já está lá): clique em &quot;Salvar listas&quot; para guardar."/>
+                                        <WrapPanel>
+                                            <Button x:Name="ExportListsButton" Content="Exportar listas..." Margin="0,0,8,0" Click="ExportListsButton_Click"/>
+                                            <Button x:Name="ImportListsButton" Content="Importar listas..." Click="ImportListsButton_Click"/>
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
+                            </Expander>
+
+                            <!-- Ação principal da tela: borda em degradê carmesim, fundo levemente avermelhado -->
+                            <Border Style="{StaticResource Card}" Padding="20"
+                                    BorderBrush="{StaticResource AccentBorderGradient}" BorderThickness="1.5">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#F01F1722" Offset="0"/>
+                                        <GradientStop Color="#F02C1220" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <StackPanel>
+                                    <TextBlock Text="INICIAR BLOQUEIO" Style="{StaticResource Overline}" Margin="0,0,0,4"/>
+                                    <TextBlock Text="Por quanto tempo?" Style="{StaticResource SectionHeader}" FontSize="17"/>
+                                    <TextBlock Text="Depois de iniciado, não existe forma de cancelar antes do tempo acabar."
+                                               Style="{StaticResource HelpText}" Margin="0,0,0,14"/>
+
+                                    <WrapPanel Margin="0,0,0,6">
+                                        <Button Style="{StaticResource ChipButton}" Content="15 min" Tag="15" Click="PresetButton_Click"/>
+                                        <Button Style="{StaticResource ChipButton}" Content="30 min" Tag="30" Click="PresetButton_Click"/>
+                                        <Button Style="{StaticResource ChipButton}" Content="1 hora" Tag="60" Click="PresetButton_Click"/>
+                                        <Button Style="{StaticResource ChipButton}" Content="2 horas" Tag="120" Click="PresetButton_Click"/>
+                                        <Button Style="{StaticResource ChipButton}" Content="4 horas" Tag="240" Click="PresetButton_Click"/>
+                                    </WrapPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Ou digite os minutos:" VerticalAlignment="Center" Margin="0,0,12,0"
+                                                   Foreground="{StaticResource ColorTextSecondary}"/>
+                                        <TextBox x:Name="MinutesBox" Width="88" Text="30" MaxLength="5"
+                                                 PreviewTextInput="MinutesBox_PreviewTextInput" TextChanged="MinutesBox_TextChanged"/>
+                                        <TextBlock x:Name="MinutesHintText" Style="{StaticResource HelpText}"
+                                                   VerticalAlignment="Center" Margin="14,0,0,0"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                                        <Button x:Name="LockButton" Content="Iniciar bloqueio" Style="{StaticResource PrimaryButton}"
+                                                Padding="22,11" FontSize="14" Click="LockButton_Click"/>
+                                        <Button x:Name="SaveButton" Content="Salvar listas" Margin="10,0,0,0" Padding="18,11"
+                                                Click="SaveButton_Click"/>
+                                        <Button x:Name="UrgencyButton" Content="Preciso de uma pausa" Margin="10,0,0,0" Padding="18,11"
+                                                ToolTip="Trava a tela por 30 minutos, sem senha. Não zera a sua sequência."
+                                                Click="UrgencyButton_Click"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ============== ABA: PROTEÇÕES PERMANENTES ============== -->
+                <!-- ================ ABA: AGENDA (bloqueios recorrentes) ================ -->
+                <TabItem Header="Agenda">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24,18,24,24">
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Bloqueios agendados" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock x:Name="ScheduleStatusText" TextWrapping="Wrap" Margin="0,6,0,10"
+                                               Foreground="{StaticResource ColorTextSecondary}" LineHeight="20"/>
+                                    <TextBlock x:Name="ScheduleListText" TextWrapping="Wrap"
+                                               Foreground="{StaticResource ColorTextPrimary}" LineHeight="24"/>
+                                    <TextBlock Style="{StaticResource HelpText}" TextWrapping="Wrap" Margin="0,12,0,0"
+                                               Text="O bloqueio liga sozinho nos horários marcados, usando as listas salvas na aba Bloqueio (clique em Salvar listas antes). Durante o horário agendado a tela fica TRAVADA até o fim do bloqueio; reiniciar o computador não zera a espera. A primeira configuração é livre; para mudar depois, a tela trava por 15 minutos e a senha é pedida."/>
+                                    <Button x:Name="EditScheduleButton" Content="Configurar agenda" HorizontalAlignment="Left"
+                                            Margin="0,14,0,0" Click="EditScheduleButton_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <TabItem Header="Proteções">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24,18,24,24">
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Proteções permanentes" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="Ficam sempre ligadas, independente do timer de bloqueio. Ativar não pede senha; desativar pede senha e uma sequência de confirmações."/>
+                                    <Border Background="{StaticResource ColorBackground}" BorderBrush="{StaticResource ColorBorder}"
+                                            BorderThickness="1" CornerRadius="10" Padding="14,12" Margin="0,0,0,14">
+                                        <TextBlock Style="{StaticResource HelpText}" Margin="0" LineHeight="22"
+                                                   Foreground="{StaticResource ColorTextSecondary}"
+                                                   Text="• SafeSearch forçado (Google, Bing, YouTube)&#x0A;• DNS sobre HTTPS desligado nos navegadores&#x0A;• Extensão de bloqueio instalada no Chrome/Edge/Brave&#x0A;• Pasta do programa protegida contra exclusão"/>
+                                    </Border>
+                                    <Button x:Name="PermanentProtectionsButton" Content="Ativar proteções permanentes"
+                                            Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left" Click="PermanentProtectionsButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="AppLocker" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="Impede navegadores 'anti-bloqueio' de sequer abrir. Só existe no Windows 11 Pro/Enterprise/Education."/>
+                                    <Button x:Name="ApplyAppLockerButton" Content="Aplicar regras AppLocker"
+                                            HorizontalAlignment="Left" Click="ApplyAppLockerButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="VPNs de uso comum (opcional)" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="As VPNs e proxies conhecidos (NordVPN, WARP, Psiphon...) já são encerradas durante o bloqueio. Esta opção inclui também ferramentas de rede privada que muita gente usa de forma legítima: Tailscale, ZeroTier, Hamachi, ngrok e cloudflared. Vem DESLIGADA. Ativar não pede senha; desativar pede senha e uma sequência de confirmações."/>
+                                    <Button x:Name="OptionalVpnButton" Content="Ativar bloqueio de Tailscale, ZeroTier e similares"
+                                            HorizontalAlignment="Left" Click="OptionalVpnButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Detector de imagens (opcional, beta)" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="A cada poucos segundos, com bloqueio ativo ou proteções permanentes, o app olha a tela e passa a imagem por um modelo que roda no seu PC. Nada é salvo nem enviado; o log guarda só a pontuação. Imagem acima do limite minimiza as janelas e trava a tela em escada: 5 minutos na 1ª vez, 15 na 2ª e 30 da 3ª em diante (zera após 24 h sem casos); a varredura é a cada 2 segundos. Precisa do arquivo do modelo (ver docs\DETECTOR-DE-IMAGENS-PC.md). Limites: janelas protegidas contra captura saem pretas, há falsos positivos e falsos negativos (ilustração e imagens de IA). Vem DESLIGADO. Ativar não pede senha; desativar pede senha e uma sequência de confirmações."/>
+                                    <TextBlock x:Name="ImageDetectorStatusText" Style="{StaticResource HelpText}" Margin="0,0,0,8"/>
+                                    <Button x:Name="ImageDetectorButton" Content="Ativar detector de imagens"
+                                            HorizontalAlignment="Left" Click="ImageDetectorButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Máquinas virtuais, WSL e Sandbox (opcional)" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="Uma máquina virtual tem rede própria e escapa de todas as proteções do Windows. Esta opção encerra, durante o bloqueio, o WSL, o Windows Sandbox, o VirtualBox, o VMware e o QEMU (inclusive emuladores Android). Vem DESLIGADA, porque quem usa VM no trabalho perderia o acesso durante o bloqueio. Ativar não pede senha; desativar pede senha e uma sequência de confirmações. Limite: o Windows pode recusar encerrar o processo vmmem; os programas que abrem a VM sempre são encerrados."/>
+                                    <Button x:Name="VirtualizationButton" Content="Ativar bloqueio de máquinas virtuais, WSL e Sandbox"
+                                            HorizontalAlignment="Left" Click="VirtualizationButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Filtro de DNS local (opcional, avançado)" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="O Watchdog passa a responder as consultas de DNS do PC: sites da sua lista (e todos os subdomínios) deixam de existir, e o resto é consultado no Cloudflare Família, que também recusa sites adultos. Fecha o desvio por DNS-sobre-HTTPS/TLS e por DNS de terceiros (regras de firewall). Vem DESLIGADO. Só vale com bloqueio ativo ou proteções permanentes. Mexe no DNS de TODO o PC: se o filtro falhar, ele se desfaz sozinho; se algo der errado, rode emergency-fix-hosts.bat como Administrador. Ativar não pede senha; desativar pede senha e uma sequência de confirmações."/>
+                                    <Button x:Name="LocalDnsButton" Content="Ativar filtro de DNS local"
+                                            HorizontalAlignment="Left" Click="LocalDnsButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Modo anônimo sempre bloqueado (opcional)" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="Por padrão o modo anônimo/InPrivate só é bloqueado durante o bloqueio temporizado. Fora dele a extensão em geral não roda em janelas anônimas (só o arquivo hosts e o vigia da barra de endereço). Esta opção mantém o modo anônimo desativado o tempo todo, desde que as proteções permanentes estejam ligadas. Vem DESLIGADA. Ativar não pede senha; desativar pede senha e uma sequência de confirmações."/>
+                                    <Button x:Name="IncognitoAlwaysButton" Content="Ativar bloqueio permanente do modo anônimo"
+                                            HorizontalAlignment="Left" Click="IncognitoAlwaysButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Arquivos da web (opcional)" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="Durante o bloqueio, tradutores de página, caches de buscador e acesso direto por número de IP já são barrados. Serviços de arquivo da web (Wayback Machine, archive.today e similares) também mostram uma cópia de outro site, mas têm muito uso legítimo, então esta opção vem DESLIGADA. Só vale durante o bloqueio. Ativar não pede senha; desativar pede senha e uma sequência de confirmações."/>
+                                    <Button x:Name="WebArchivesButton" Content="Ativar bloqueio de arquivos da web"
+                                            HorizontalAlignment="Left" Click="WebArchivesButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ================ ABA: STATUS / DIAGNÓSTICO ================ -->
+                <TabItem Header="Status">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24,18,24,24">
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Sequência e estatísticas" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock x:Name="StreakValueText" Text="—" FontSize="34" FontWeight="Bold" Margin="0,8,0,0"
+                                               Foreground="{StaticResource ColorAccent}"/>
+                                    <TextBlock x:Name="StreakCaptionText" Text="sem tentar burlar" Margin="0,0,0,10"
+                                               Foreground="{StaticResource ColorTextSecondary}"/>
+                                    <TextBlock x:Name="StatsDetailText" TextWrapping="Wrap"
+                                               Foreground="{StaticResource ColorTextSecondary}" LineHeight="20"/>
+
+                                    <TextBlock Text="Horários de risco (buscas barradas e tentativas, por hora do dia)" Margin="0,16,0,6"
+                                               FontWeight="SemiBold" TextWrapping="Wrap" Foreground="{StaticResource ColorTextPrimary}"/>
+                                    <TextBlock x:Name="RiskMapText" FontFamily="Consolas" FontSize="16"
+                                               Foreground="{StaticResource ColorAccent}"/>
+                                    <TextBlock x:Name="RiskAxisText" FontFamily="Consolas" FontSize="11"
+                                               Foreground="{StaticResource ColorTextSecondary}"/>
+                                    <TextBlock x:Name="RiskSuggestionText" TextWrapping="Wrap" Margin="0,8,0,0"
+                                               Foreground="{StaticResource ColorTextSecondary}" LineHeight="20"/>
+                                    <Button x:Name="SuggestScheduleButton" Content="Criar agenda sugerida" Visibility="Collapsed"
+                                            HorizontalAlignment="Left" Margin="0,10,0,0" Click="SuggestScheduleButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Serviço e proteções" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock x:Name="ServiceStatusText" Text="Verificando..." TextWrapping="Wrap" Margin="0,6,0,8"
+                                               Foreground="{StaticResource ColorTextSecondary}" LineHeight="20"/>
+                                    <TextBlock x:Name="ProtectionsStatusText" TextWrapping="Wrap"
+                                               Foreground="{StaticResource ColorTextSecondary}" LineHeight="20"/>
+                                    <Button x:Name="RefreshStatusButton" Content="Atualizar status" HorizontalAlignment="Left"
+                                            Margin="0,14,0,0" Click="RefreshStatusButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Expander Header="Ferramentas de diagnóstico" Margin="0,0,0,12">
+                                <Border Style="{StaticResource Card}" Margin="0">
+                                    <StackPanel>
+                                        <Button x:Name="TestHostsButton" Content="Testar escrita do hosts agora" HorizontalAlignment="Left" Margin="0,0,0,8" Click="TestHostsButton_Click"/>
+                                        <Button x:Name="InstallExtensionManuallyButton" Content="Instalar extensão manualmente" HorizontalAlignment="Left" Margin="0,0,0,8" Click="InstallExtensionManuallyButton_Click"/>
+                                        <Button x:Name="VerifyCrxButton" Content="Verificar o .crx da extensão" HorizontalAlignment="Left" Margin="0,0,0,8" Click="VerifyCrxButton_Click"/>
+                                        <Button x:Name="OpenLogButton" Content="Abrir log de diagnóstico" HorizontalAlignment="Left" Margin="0,0,0,8" Click="OpenLogButton_Click"/>
+                                        <Button x:Name="LocateWatchdogButton" Content="Localizar Watchdog.exe manualmente" HorizontalAlignment="Left" Margin="0,0,0,8" Click="LocateWatchdogButton_Click"/>
+                                        <Button x:Name="CleanupOrphansButton" Content="Encerrar Watchdogs órfãos e resetar ACL do hosts" HorizontalAlignment="Left" Click="CleanupOrphansButton_Click"/>
+                                    </StackPanel>
+                                </Border>
+                            </Expander>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+                <!-- ===================== ABA: CONTA ===================== -->
+                <TabItem Header="Conta">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24,18,24,24">
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Senha" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="Exigida para desinstalar ou desativar as proteções permanentes."/>
+                                    <Button x:Name="SetPasswordButton" Content="Definir/alterar senha" HorizontalAlignment="Left" Click="SetPasswordButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource Card}" BorderBrush="{StaticResource ColorDangerDark}">
+                                <StackPanel>
+                                    <TextBlock Text="Zona de risco" Style="{StaticResource SectionHeader}" Foreground="{StaticResource ColorDanger}"/>
+                                    <TextBlock Style="{StaticResource HelpText}" Margin="0,0,0,12"
+                                               Text="Remove o serviço e restaura o hosts e as políticas de navegador. Antes da decisão final a tela trava por 15 minutos."/>
+                                    <Button x:Name="UninstallButton" Content="Desinstalar" Style="{StaticResource DangerButton}"
+                                            HorizontalAlignment="Left" Click="UninstallButton_Click"/>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+
+            </TabControl>
+
+            <!-- Aviso rápido (some sozinho): resultado de "Salvar", "Importar" etc. Agora flutua sobre o
+                 conteúdo (antes empurrava o layout) e entra com fade e deslize (ver ShowToast). -->
+            <Border x:Name="ToastBorder" Grid.Row="2" Visibility="Collapsed"
+                    HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="24,0,24,20" MaxWidth="600"
+                    Background="{StaticResource ColorSurfaceRaised}" BorderBrush="{StaticResource ColorAccent}"
+                    BorderThickness="1" CornerRadius="12" Padding="18,11">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="22" ShadowDepth="4" Direction="270" Opacity="0.55" Color="#000000"/>
+                </Border.Effect>
+                <TextBlock x:Name="ToastText" TextWrapping="Wrap" FontWeight="SemiBold"/>
+            </Border>
+        </Grid>
+
+        <!-- ===================== BARRA DE TÍTULO ===================== -->
+        <Border x:Name="TitleBar" VerticalAlignment="Top" Height="40" Background="#F20A090E"
+                BorderBrush="{StaticResource ColorBorder}" BorderThickness="0,0,0,1">
+            <Grid>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="14,0,0,0" IsHitTestVisible="False">
+                    <Image Source="/Assets/shark-glyph.png" Width="16" Height="16" Margin="0,0,10,0"/>
+                    <TextBlock Text="SharkBlocker" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{StaticResource ColorTextSecondary}" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource CaptionButton}" Tag="&#xE921;" Click="MinimizeButton_Click"
+                            AutomationProperties.Name="Minimizar"/>
+                    <Button x:Name="MaximizeButton" Style="{StaticResource CaptionButton}" Tag="&#xE922;" Click="MaximizeButton_Click"
+                            AutomationProperties.Name="Maximizar"/>
+                    <Button Style="{StaticResource CaptionCloseButton}" Tag="&#xE8BB;" Click="CloseButton_Click"
+                            AutomationProperties.Name="Fechar"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

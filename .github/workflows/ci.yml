@@ -1,0 +1,50 @@
+# CI do SharkBlocker (PC). Compila tudo e roda todos os testes a cada push e pull request.
+# Pasta do projeto = raiz do repositório (onde está SharkBlocker.sln).
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  js:
+    name: Extensão e paridade (Node)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Testes da extensão
+        run: node tests/extension/run-tests.js
+      - name: Paridade (JS contra a intenção dos casos)
+        run: node tests/parity/run-parity.js
+      - name: cases.json está em dia com o gerador
+        run: |
+          node tests/parity/generate-cases.js
+          git diff --exit-code -- tests/parity/cases.json
+      - name: Extensão mudou? Então a version do manifest.json tem de subir
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: node tests/ci/check-extension-version.js
+
+  dotnet:
+    name: Compilar e testar (.NET)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Compilar App e Watchdog (Release)
+        run: dotnet build SharkBlocker.sln -c Release
+      - name: Testes de paridade, DNS e estatísticas
+        run: dotnet test tests/SharkBlocker.ParityTests -c Release

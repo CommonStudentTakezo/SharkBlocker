@@ -1,0 +1,2642 @@
+{
+ "version": 1,
+ "nota": "Casos de paridade entre a extensão (JS, referência), o app de PC (C#) e o app Android (Kotlin). Gerado por tests/parity/generate-cases.js. NÃO edite à mão: edite o gerador e rode de novo.",
+ "url_cases": [
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://browser.lol/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://browser.lol/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://app.browser.lol/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://app.browser.lol/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.browserling.com/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.browserling.com/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://croxyproxy.com/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://croxyproxy.com/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://proxysite.com/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://proxysite.com/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://free-proxy-list.net/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://free-proxy-list.net/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://unblock-sites.xyz/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://unblock-sites.xyz/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://cloudbrowser.io/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://cloudbrowser.io/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://virtual-browser.net/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://virtual-browser.net/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://onlinebrowser.app/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://onlinebrowser.app/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://nordvpn.com/pt-br/",
+   "expected": "proxy"
+  },
+  {
+   "label": "proxy direto (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://nordvpn.com/pt-br/",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=proxybrowser",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=ProxyBrowser",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=proxy-browser",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=proxy%20browser",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=freeproxysite",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=pr0xy",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=p%20r%20o%20x%20y",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=unblockedgames66",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=unblocked%20games",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=browserlol",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=browser%20lol",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=freevpn",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=torbrowser",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca colada",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=tor%20browser",
+   "expected": "proxy"
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=hist%C3%B3ria%20do%20brasil",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=hist%C3%B3ria%20do%20brasil",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=motor%20de%20busca",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=motor%20de%20busca",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=doctor%20who",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=doctor%20who",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=vit%C3%B3ria%20x%20flamengo",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=vit%C3%B3ria%20x%20flamengo",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=protocolo%20http",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=protocolo%20http",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=approximately",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=approximately",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=bypass%20surgery%20recovery%20time",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=bypass%20surgery%20recovery%20time",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=best%20browser%20for%20developers",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=best%20browser%20for%20developers",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=browser%20compatibility%20table",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=browser%20compatibility%20table",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=cloud%20computing",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=cloud%20computing",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=nginx%20reverse%20proxy%20config",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=nginx%20reverse%20proxy%20config",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=proxy%20design%20pattern%20c%23",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=proxy%20design%20pattern%20c%23",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=javascript%20proxy%20object",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=javascript%20proxy%20object",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=haproxy%20tutorial",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=haproxy%20tutorial",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=receita%20de%20bolo",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=receita%20de%20bolo",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=how%20to%20unblock%20a%20number%20on%20whatsapp",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=how%20to%20unblock%20a%20number%20on%20whatsapp",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=tabela%20peri%C3%B3dica",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=tabela%20peri%C3%B3dica",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=rea%C3%A7%C3%A3o%20de%20oxirredu%C3%A7%C3%A3o",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=rea%C3%A7%C3%A3o%20de%20oxirredu%C3%A7%C3%A3o",
+   "expected": null
+  },
+  {
+   "label": "busca normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=%C3%A1cido%20sulf%C3%BArico",
+   "expected": null
+  },
+  {
+   "label": "busca normal (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=%C3%A1cido%20sulf%C3%BArico",
+   "expected": null
+  },
+  {
+   "label": "site normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/",
+   "expected": null
+  },
+  {
+   "label": "site normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/",
+   "expected": null
+  },
+  {
+   "label": "site normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://pt.wikipedia.org/wiki/Servidor_proxy",
+   "expected": null
+  },
+  {
+   "label": "site normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.haproxy.org/",
+   "expected": null
+  },
+  {
+   "label": "site normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://proxyman.io/",
+   "expected": null
+  },
+  {
+   "label": "site normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://nginx.org/en/docs/",
+   "expected": null
+  },
+  {
+   "label": "site normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/watch?v=abc",
+   "expected": null
+  },
+  {
+   "label": "site normal",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://pt.wikipedia.org/wiki/Quimica",
+   "expected": null
+  },
+  {
+   "label": "adulto (domínio)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.pornhub.com/",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (domínio)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://qualquer.xxx/",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (domínio)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://xvideos.com/",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (domínio)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://sub.xnxx.com/",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (busca ofuscada)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=porn",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (busca ofuscada)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=p0rn",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (busca ofuscada)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=p.o.r.n",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (busca ofuscada)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=pooorn",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (busca ofuscada)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=%D1%80%D0%BErn",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (busca ofuscada)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=%EF%BD%90%EF%BD%8F%EF%BD%92%EF%BD%8E",
+   "expected": "adult"
+  },
+  {
+   "label": "adulto (busca ofuscada)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=n4k3d",
+   "expected": "adult"
+  },
+  {
+   "label": "exceção nsfw_model (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model",
+   "expected": null
+  },
+  {
+   "label": "exceção nsfw_model (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model",
+   "expected": null
+  },
+  {
+   "label": "exceção nsfw_model (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model/",
+   "expected": null
+  },
+  {
+   "label": "exceção nsfw_model (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model/",
+   "expected": null
+  },
+  {
+   "label": "exceção nsfw_model (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.github.com/gantman/NSFW_model/releases/tag/1.1.0",
+   "expected": null
+  },
+  {
+   "label": "exceção nsfw_model (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.github.com/gantman/NSFW_model/releases/tag/1.1.0",
+   "expected": null
+  },
+  {
+   "label": "exceção nsfw_model (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model/releases/download/1.1.0/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção nsfw_model (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model/releases/download/1.1.0/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção nsfw_model (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção nsfw_model (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model?q=porn",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model/blob/master/pornhub.txt",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model/releases/download/1.1.0/porn.zip",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model/releases/download/1.1.0/nsfw_mobilenet2.h5?x=porn",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn/porn.h5",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.h5?x=porn",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn_extra/modelo.h5",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/outro_bucket/nsfwjscdn/modelo.h5",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/outro/nsfw_model",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://github.com/GantMan/nsfw_model_extra",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://evil.example.com/github.com/GantMan/nsfw_model",
+   "expected": "adult"
+  },
+  {
+   "label": "nsfw fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.reddit.com/r/nsfw/",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=biquini",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=biquini",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=biqu%C3%ADni+cavado",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=biqu%C3%ADni+cavado",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=Biquinis+2026",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=Biquinis+2026",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=bikini",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=bikini",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=bikinis+praia",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=bikinis+praia",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=B1QUIN1",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=B1QUIN1",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://loja.example.com/moda/biquini-cavado",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://loja.example.com/moda/biquini-cavado",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://loja.example.com/BIQUÍNI",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://loja.example.com/BIQUÍNI",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://biquini.example.com/",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://biquini.example.com/",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/results?search_query=micro+biquini",
+   "expected": "adult"
+  },
+  {
+   "label": "biquini (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/results?search_query=micro+biquini",
+   "expected": "adult"
+  },
+  {
+   "label": "site permanente (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.facebook.com/",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.facebook.com/",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://m.facebook.com/home",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://m.facebook.com/home",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.reddit.com/r/brasil",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.reddit.com/r/brasil",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.tiktok.com/@alguem",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.tiktok.com/@alguem",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.instagram.com/p/abc/",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.instagram.com/p/abc/",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://x.com/alguem",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://x.com/alguem",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://t.me/canal",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://t.me/canal",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://duckduckgo.com/?q=oi",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://duckduckgo.com/?q=oi",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.netflix.com/browse",
+   "expected": "url"
+  },
+  {
+   "label": "site permanente (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.netflix.com/browse",
+   "expected": "url"
+  },
+  {
+   "label": "short barrado (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/shorts/abc123",
+   "expected": "url"
+  },
+  {
+   "label": "short barrado (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/shorts/abc123",
+   "expected": "url"
+  },
+  {
+   "label": "short barrado (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://m.youtube.com/shorts/abc123",
+   "expected": "url"
+  },
+  {
+   "label": "short barrado (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://m.youtube.com/shorts/abc123",
+   "expected": "url"
+  },
+  {
+   "label": "short barrado (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://youtube.com/shorts",
+   "expected": "url"
+  },
+  {
+   "label": "short barrado (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://youtube.com/shorts",
+   "expected": "url"
+  },
+  {
+   "label": "youtube normal liberado",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/",
+   "expected": null
+  },
+  {
+   "label": "youtube normal liberado",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/watch?v=abc",
+   "expected": null
+  },
+  {
+   "label": "youtube normal liberado",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/shortsvideo",
+   "expected": null
+  },
+  {
+   "label": "youtube normal liberado",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://youtu.be/abc",
+   "expected": null
+  },
+  {
+   "label": "youtube normal liberado",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://music.youtube.com/watch?v=abc",
+   "expected": null
+  },
+  {
+   "label": "youtube normal liberado",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/@canal/videos",
+   "expected": null
+  },
+  {
+   "label": "youtube bloqueado",
+   "state": {
+    "locked": true,
+    "sites": [
+     "youtube.com"
+    ],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.youtube.com/watch?v=abc",
+   "expected": "url"
+  },
+  {
+   "label": "m.youtube bloqueado",
+   "state": {
+    "locked": true,
+    "sites": [
+     "youtube.com"
+    ],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://m.youtube.com/",
+   "expected": "url"
+  },
+  {
+   "label": "youtube music liberado",
+   "state": {
+    "locked": true,
+    "sites": [
+     "youtube.com"
+    ],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://music.youtube.com/watch?v=abc",
+   "expected": null
+  },
+  {
+   "label": "sub de youtube music liberado",
+   "state": {
+    "locked": true,
+    "sites": [
+     "youtube.com"
+    ],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://x.music.youtube.com/",
+   "expected": null
+  },
+  {
+   "label": "youtube music listado explicitamente",
+   "state": {
+    "locked": true,
+    "sites": [
+     "music.youtube.com"
+    ],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://music.youtube.com/",
+   "expected": "url"
+  },
+  {
+   "label": "playboy/nome (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=playboy+magazine",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=playboy+magazine",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=revista+playboy+antiga",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=revista+playboy+antiga",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.playboy.com/",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.playboy.com/",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=mia+khalifa",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=mia+khalifa",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=Riley+Reid+fotos",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=Riley+Reid+fotos",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://example.com/models/sasha-grey",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://example.com/models/sasha-grey",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=playmate+of+the+month",
+   "expected": "adult"
+  },
+  {
+   "label": "playboy/nome (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=playmate+of+the+month",
+   "expected": "adult"
+  },
+  {
+   "label": "não é nome/playboy",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=playboy+carti",
+   "expected": null
+  },
+  {
+   "label": "não é nome/playboy",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=riley+keough",
+   "expected": null
+  },
+  {
+   "label": "não é nome/playboy",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=sasha+obama",
+   "expected": null
+  },
+  {
+   "label": "não é biquini",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=receita+de+bolo",
+   "expected": null
+  },
+  {
+   "label": "não é biquini",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://example.com/biquinho",
+   "expected": null
+  },
+  {
+   "label": "não é biquini",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://example.com/liquini",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.us-east-1.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.us-east-1.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3-us-west-2.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3-us-west-2.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.dualstack.us-east-1.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.dualstack.us-east-1.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com//ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com//ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn%2Fnsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn%2Fnsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/NSFWJSCDN/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/NSFWJSCDN/nsfw_mobilenet2.224x224.h5",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn/TFJS_nsfw_mobilenet/tfjs_quant_nsfw_mobilenet/model.json",
+   "expected": null
+  },
+  {
+   "label": "exceção S3 do modelo (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn/TFJS_nsfw_mobilenet/tfjs_quant_nsfw_mobilenet/model.json",
+   "expected": null
+  },
+  {
+   "label": "S3 fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.us-east-1.amazonaws.com/ir_public/nsfwjscdn/porn.h5",
+   "expected": "adult"
+  },
+  {
+   "label": "S3 fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.us-east-1.amazonaws.com/outro_bucket/nsfwjscdn/modelo.h5",
+   "expected": "adult"
+  },
+  {
+   "label": "S3 fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn%2Fporn.h5",
+   "expected": "adult"
+  },
+  {
+   "label": "S3 fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/?prefix=nsfwjscdn/",
+   "expected": "adult"
+  },
+  {
+   "label": "S3 fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/nsfwjscdn/modelo.h5#nsfw=porn",
+   "expected": "adult"
+  },
+  {
+   "label": "S3 fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.us-east-1.amazonaws.com.evil.example.com/ir_public/nsfwjscdn/modelo.h5",
+   "expected": "adult"
+  },
+  {
+   "label": "S3 fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.evil.example.com/ir_public/nsfwjscdn/modelo.h5",
+   "expected": "adult"
+  },
+  {
+   "label": "S3 fora da exceção",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://s3.amazonaws.com/ir_public/x/nsfwjscdn",
+   "expected": "adult"
+  },
+  {
+   "label": "destino embutido (?url=)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://redirecionador.example.org/?url=https://www.pornhub.com/",
+   "expected": "adult"
+  },
+  {
+   "label": "destino embutido (base64)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://redirecionador.example.org/?u=aHR0cHM6Ly93d3cucG9ybmh1Yi5jb20v",
+   "expected": "adult"
+  },
+  {
+   "label": "destino embutido (caminho)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://web.archive.example.org/web/2020/https://www.pornhub.com/",
+   "expected": "adult"
+  },
+  {
+   "label": "site do usuário (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [
+     "meusite.com"
+    ],
+    "keywords": [
+     "apostas"
+    ],
+    "blockWebArchives": false
+   },
+   "url": "https://sub.meusite.com/x",
+   "expected": "url"
+  },
+  {
+   "label": "site do usuário (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [
+     "meusite.com"
+    ],
+    "keywords": [
+     "apostas"
+    ],
+    "blockWebArchives": false
+   },
+   "url": "https://sub.meusite.com/x",
+   "expected": null
+  },
+  {
+   "label": "palavra do usuário na busca (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [
+     "meusite.com"
+    ],
+    "keywords": [
+     "apostas"
+    ],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=apostas%20esportivas",
+   "expected": "keyword_search"
+  },
+  {
+   "label": "palavra do usuário na busca (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [
+     "meusite.com"
+    ],
+    "keywords": [
+     "apostas"
+    ],
+    "blockWebArchives": false
+   },
+   "url": "https://www.google.com/search?q=apostas%20esportivas",
+   "expected": null
+  },
+  {
+   "label": "tradutor (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://translate.google.com/translate?u=https://exemplo.com",
+   "expected": "gateway"
+  },
+  {
+   "label": "tradutor (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://translate.google.com/translate?u=https://exemplo.com",
+   "expected": null
+  },
+  {
+   "label": "IP público (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "http://203.0.113.5/",
+   "expected": "ip"
+  },
+  {
+   "label": "IP privado (bloqueio)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "http://192.168.0.1/",
+   "expected": null
+  },
+  {
+   "label": "IP público (aberto)",
+   "state": {
+    "locked": false,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "http://203.0.113.5/",
+   "expected": null
+  },
+  {
+   "label": "arquivo web (opção ligada)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": true
+   },
+   "url": "https://web.archive.org/web/2020/https://exemplo.com",
+   "expected": "gateway"
+  },
+  {
+   "label": "arquivo web (opção desligada)",
+   "state": {
+    "locked": true,
+    "sites": [],
+    "keywords": [],
+    "blockWebArchives": false
+   },
+   "url": "https://web.archive.org/web/2020/https://exemplo.com",
+   "expected": null
+  }
+ ],
+ "service_cases": [
+  {
+   "host": "translate.google.com.br",
+   "path": "/translate",
+   "pattern": "translate.google.*/translate",
+   "expected": true
+  },
+  {
+   "host": "translate.google.com",
+   "path": "/website",
+   "pattern": "translate.google.*/translate",
+   "expected": false
+  },
+  {
+   "host": "web.archive.org",
+   "path": "/web/2020/x",
+   "pattern": "archive.org/web",
+   "expected": true
+  },
+  {
+   "host": "archive.org",
+   "path": "/details/livro",
+   "pattern": "archive.org/web",
+   "expected": false
+  },
+  {
+   "host": "sub.exemplo.com",
+   "path": "/",
+   "pattern": "exemplo.com",
+   "expected": true
+  },
+  {
+   "host": "outroexemplo.com",
+   "path": "/",
+   "pattern": "exemplo.com",
+   "expected": false
+  },
+  {
+   "host": "translate.google.co.uk",
+   "path": "/translate",
+   "pattern": "translate.google.*/translate",
+   "expected": true
+  }
+ ],
+ "ip_cases": [
+  {
+   "host": "8.8.8.8",
+   "expected": true
+  },
+  {
+   "host": "203.0.113.5",
+   "expected": true
+  },
+  {
+   "host": "10.0.0.1",
+   "expected": false
+  },
+  {
+   "host": "127.0.0.1",
+   "expected": false
+  },
+  {
+   "host": "192.168.1.10",
+   "expected": false
+  },
+  {
+   "host": "172.16.0.1",
+   "expected": false
+  },
+  {
+   "host": "169.254.1.1",
+   "expected": false
+  },
+  {
+   "host": "100.64.0.1",
+   "expected": false
+  },
+  {
+   "host": "[::1]",
+   "expected": false
+  },
+  {
+   "host": "[2001:4860:4860::8888]",
+   "expected": true
+  },
+  {
+   "host": "[fe80::1]",
+   "expected": false
+  },
+  {
+   "host": "[fc00::1]",
+   "expected": false
+  },
+  {
+   "host": "exemplo.com",
+   "expected": false
+  },
+  {
+   "host": "localhost",
+   "expected": false
+  }
+ ]
+}

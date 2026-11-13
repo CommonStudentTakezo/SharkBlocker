@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Watchdog</AssemblyName>
+    <RootNamespace>SharkBlocker.Watchdog</RootNamespace>
+    <UserSecretsId>dotnet-Watchdog</UserSecretsId>
+
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- Publica só os recursos de idioma pt-BR (some ~13 pastas de tradução do WPF/WinForms: cs, de, es, fr, it, ja, ko, pl, ru, tr, zh-*). -->
+    <SatelliteResourceLanguages>pt-BR</SatelliteResourceLanguages>
+    <!-- Serviço pequeno e sem interface: GC não concorrente poupa uma thread e memória. -->
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.1" />
+    <!-- Mutex com DACL explícita (ProcessSync) para sincronização entre o Watchdog (sessão 0,
+         conta SYSTEM) e o App (sessão do usuário logado). O Named Pipe usa P/Invoke direto em vez
+         do pacote System.IO.Pipes.AccessControl (ver comentário equivalente em App.csproj). -->
+    <PackageReference Include="System.Threading.AccessControl" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\App\Models\BlockList.cs" Link="Models\BlockList.cs" />
+    <Compile Include="..\App\Services\StateManager.cs" Link="Services\StateManager.cs" />
+    <Compile Include="..\App\Services\HostsFileManager.cs" Link="Services\HostsFileManager.cs" />
+    <Compile Include="..\App\Services\SafeSearchDomains.cs" Link="Services\SafeSearchDomains.cs" />
+    <Compile Include="..\App\Services\TermLists.cs" Link="Services\TermLists.cs" />
+    <Compile Include="..\App\Services\HostsWatcher.cs" Link="Services\HostsWatcher.cs" />
+    <Compile Include="..\App\Services\ProcessBlocker.cs" Link="Services\ProcessBlocker.cs" />
+    <Compile Include="..\App\Services\ProcessStartWatcher.cs" Link="Services\ProcessStartWatcher.cs" />
+    <Compile Include="..\App\Services\NativeVpnGuard.cs" Link="Services\NativeVpnGuard.cs" />
+    <Compile Include="..\App\Services\BrowserPolicyManager.cs" Link="Services\BrowserPolicyManager.cs" />
+    <Compile Include="..\App\Services\LocalStateServer.cs" Link="Services\LocalStateServer.cs" />
+    <Compile Include="..\App\Services\FolderProtection.cs" Link="Services\FolderProtection.cs" />
+    <Compile Include="..\App\Services\ExtensionInstaller.cs" Link="Services\ExtensionInstaller.cs" />
+    <Compile Include="..\App\Services\PermanentProtections.cs" Link="Services\PermanentProtections.cs" />
+    <Compile Include="..\App\Services\AdultKeywords.cs" Link="Services\AdultKeywords.cs" />
+    <Compile Include="..\App\Services\AppStartupManager.cs" Link="Services\AppStartupManager.cs" />
+    <Compile Include="..\App\Services\Logger.cs" Link="Services\Logger.cs" />
+    <Compile Include="..\App\Services\AtomicFile.cs" Link="Services\AtomicFile.cs" />
+    <Compile Include="..\App\Services\AppPresence.cs" Link="Services\AppPresence.cs" />
+    <Compile Include="..\App\Services\UserSessionLauncher.cs" Link="Services\UserSessionLauncher.cs" />
+    <Compile Include="..\App\Services\ServiceInstaller.cs" Link="Services\ServiceInstaller.cs" />
+    <Compile Include="..\App\Services\ProcessSync.cs" Link="Services\ProcessSync.cs" />
+    <Compile Include="..\App\Services\StatsStore.cs" Link="Services\StatsStore.cs" />
+    <Compile Include="..\App\Services\BlockScheduler.cs" Link="Services\BlockScheduler.cs" />
+    <Compile Include="..\App\Services\FirewallBlocker.cs" Link="Services\FirewallBlocker.cs" />
+    <Compile Include="..\App\Services\LocalDnsFilter.cs" Link="Services\LocalDnsFilter.cs" />
+    <Compile Include="..\App\Services\DnsFilterController.cs" Link="Services\DnsFilterController.cs" />
+  </ItemGroup>
+
+</Project>
