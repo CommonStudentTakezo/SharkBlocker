@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Modelo do detector (model.onnx + model.json em App\Assets\nsfw\). Sem os arquivos, o detector fica "Sem modelo". -->
+    <!-- Modelos do detector em App\Assets\nsfw\: model.onnx + model.json (classificador) e nudenet.onnx (segunda opinião, opcional). Sem os arquivos, o detector fica "Sem modelo". -->
     <Content Include="Assets\nsfw\*.onnx;Assets\nsfw\*.json" CopyToOutputDirectory="PreserveNewest" Link="nsfw\%(Filename)%(Extension)" />
   </ItemGroup>
 

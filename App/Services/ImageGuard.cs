@@ -16,6 +16,8 @@ namespace SharkBlocker.Services;
 ///  - explícito muito alto (>= limite "imediato"): trava na hora, sem esperar confirmação;
 ///  - SUGESTIVO (biquíni/roupa sugestiva: explícito + sexy acima de um limite bem mais alto) em 3 capturas seguidas;
 ///  - captura suspeita NÃO minimiza nada: o app só refaz a varredura logo em seguida (~0,7 s) para confirmar;
+///  - SEGUNDA OPINIÃO opcional (NudeNet, partes do corpo; só se existir nsfw\nudenet.onnx): veta o "só sugestivo" sem corpo na tela
+///    (close de rosto) e confirma nudez de verdade (ver ImageDecision.Refine);
 ///  - a trava é em escada: 1ª vez 5 min, 2ª 15 min, da 3ª em diante 30 min (motivo "image"; zera após 24 h sem detecções).
 /// Limites por sensibilidade (explícito · sugestivo · imediato): Menos rígido 0,92·0,97·0,98 · Padrão 0,85·0,93·0,96 ·
 /// Mais rígido 0,70·0,85·0,92 (ver <see cref="ImageDecision.Limits"/>).
@@ -68,7 +70,11 @@ public static class ImageGuard
             _thread = new Thread(Loop) { IsBackground = true, Name = "ImageGuard" };
             _thread.Start();
             // Carrega o modelo FORA da thread da interface (uma falha no ONNX nunca pode impedir o app de abrir).
-            ThreadPool.QueueUserWorkItem(_ => { try { NsfwClassifier.Init(); } catch (Exception ex) { Logger.LogException("ImageGuard.Init", ex); } });
+            ThreadPool.QueueUserWorkItem(_ =>
+            {
+                try { NsfwClassifier.Init(); } catch (Exception ex) { Logger.LogException("ImageGuard.Init", ex); }
+                try { NudeNetDetector.Init(); } catch (Exception ex) { Logger.LogException("ImageGuard.Init (NudeNet)", ex); }
+            });
         }
     }
 
@@ -77,13 +83,21 @@ public static class ImageGuard
     /// <summary>Texto de estado para a tela e o diagnóstico.</summary>
     public static string StatusText()
     {
-        return NsfwClassifier.CurrentStatus switch
+        var main = NsfwClassifier.CurrentStatus switch
         {
             NsfwClassifier.Status.Ready => "Modelo carregado e pronto.",
             NsfwClassifier.Status.NoModel => "Sem modelo: " + NsfwClassifier.Detail,
             NsfwClassifier.Status.BadModel => "Modelo incompatível: " + NsfwClassifier.Detail,
             _ => "Ainda não verificado.",
         };
+        var second = NudeNetDetector.CurrentStatus switch
+        {
+            NudeNetDetector.Status.Ready => "NudeNet (segunda opinião) pronto.",
+            NudeNetDetector.Status.NoModel => "NudeNet (segunda opinião) " + NudeNetDetector.Detail + ".",
+            NudeNetDetector.Status.BadModel => "NudeNet (segunda opinião) incompatível: " + NudeNetDetector.Detail,
+            _ => "NudeNet ainda não verificado.",
+        };
+        return main + "\n" + second;
     }
 
     private static void Loop()
@@ -136,18 +150,22 @@ public static class ImageGuard
         }
 
         var limits = ImageDecision.Limits(state.ImageSensitivity);
+        var nudeLimits = ImageDecision.NudeLimitsFor(state.ImageSensitivity);
 
         // Vale o monitor de nível mais alto (em empate, o de maior pontuação total).
         ImageScores? worst = null;
+        NudeNetResult? worstNude = null;
         var level = ImageLevel.Clean;
         foreach (var screen in Screen.AllScreens)
         {
-            var scores = ScoreScreen(screen.Bounds);
-            if (scores == null) continue;
-            var l = ImageDecision.Evaluate(scores, limits);
+            var reading = ScoreScreen(screen.Bounds);
+            if (reading == null) continue;
+            var scores = reading.Scores;
+            var l = ImageDecision.Refine(ImageDecision.Evaluate(scores, limits), scores, reading.Nude, nudeLimits);
             if (worst == null || l > level || (l == level && scores.Total > worst.Total))
             {
                 worst = scores;
+                worstNude = reading.Nude;
                 level = l;
             }
         }
@@ -157,7 +175,7 @@ public static class ImageGuard
         if (level == ImageLevel.Clean)
         {
             _streak = 0;
-            LogCalibrationIfHigh(worst, limits);
+            LogCalibrationIfHigh(worst, worstNude, limits);
             return false;
         }
 
@@ -165,11 +183,11 @@ public static class ImageGuard
         var required = ImageDecision.ScansRequired(level);
         if (!ImageDecision.Confirmed(_streak, level))
         {
-            Logger.Log($"Imagem: suspeita {level} ({_streak}/{required}) explícito {worst.Explicit:0.00} sugestivo {worst.Sexy:0.00} | {ImageDecision.Describe(worst)}");
+            Logger.Log($"Imagem: suspeita {level} ({_streak}/{required}) explícito {worst.Explicit:0.00} sugestivo {worst.Sexy:0.00} | {ImageDecision.Describe(worst)} | {ImageDecision.DescribeNude(worstNude)}");
             return true;
         }
 
-        Logger.Log($"Imagem: CONFIRMADA {level} ({_streak} capturas) explícito {worst.Explicit:0.00} sugestivo {worst.Sexy:0.00} (limites {limits.Explicit:0.00}/{limits.Combined:0.00}/{limits.Immediate:0.00}) | {ImageDecision.Describe(worst)}");
+        Logger.Log($"Imagem: CONFIRMADA {level} ({_streak} capturas) explícito {worst.Explicit:0.00} sugestivo {worst.Sexy:0.00} (limites {limits.Explicit:0.00}/{limits.Combined:0.00}/{limits.Immediate:0.00}) | {ImageDecision.Describe(worst)} | {ImageDecision.DescribeNude(worstNude)}");
         _streak = 0;
         // CARÊNCIA: nos 45 s depois de uma trava acabar, só minimiza (não trava de novo), para dar tempo de fechar
         // o que ficou aberto. Sem isso, uma imagem que ficou na tela travaria em laço de 30 em 30 min.
@@ -189,16 +207,19 @@ public static class ImageGuard
     /// Registra (no máx. 1 vez a cada 10 s) capturas que NÃO travaram mas tiveram pontuação alta, só com números. Serve para
     /// calibrar os limites com casos reais (ex.: um vídeo com close de rosto) sem precisar de imagem.
     /// </summary>
-    private static void LogCalibrationIfHigh(ImageScores s, ImageLimits limits)
+    private static void LogCalibrationIfHigh(ImageScores s, NudeNetResult? nude, ImageLimits limits)
     {
         if (s.Total < CalibrationLogFloor) return;
         var now = DateTime.UtcNow;
         if (now - _lastCalibrationLogUtc < CalibrationLogEvery) return;
         _lastCalibrationLogUtc = now;
-        Logger.Log($"Imagem: abaixo do limite, explícito {s.Explicit:0.00} sugestivo {s.Sexy:0.00} (limites {limits.Explicit:0.00}/{limits.Combined:0.00}/{limits.Immediate:0.00}) | {ImageDecision.Describe(s)}");
+        Logger.Log($"Imagem: abaixo do limite, explícito {s.Explicit:0.00} sugestivo {s.Sexy:0.00} (limites {limits.Explicit:0.00}/{limits.Combined:0.00}/{limits.Immediate:0.00}) | {ImageDecision.Describe(s)} | {ImageDecision.DescribeNude(nude)}");
     }
 
-    private static ImageScores? ScoreScreen(Rectangle bounds)
+    /// <summary>Leitura de uma tela: pontuações do classificador + (opcional) resumo do NudeNet.</summary>
+    private sealed record ScreenReading(ImageScores Scores, NudeNetResult? Nude);
+
+    private static ScreenReading? ScoreScreen(Rectangle bounds)
     {
         if (bounds.Width <= 0 || bounds.Height <= 0) return null;
         try
@@ -208,7 +229,13 @@ public static class ImageGuard
             {
                 g.CopyFromScreen(bounds.Location, System.Drawing.Point.Empty, bounds.Size);
             }
-            return NsfwClassifier.Score(bmp);
+            var scores = NsfwClassifier.Score(bmp);
+            if (scores == null) return null;
+
+            // Segunda opinião só quando o classificador já desconfia (poupa CPU: a maioria das capturas é limpa).
+            NudeNetResult? nude = null;
+            if (NudeNetDetector.IsReady && scores.Total >= ImageDecision.NudeNetGate) nude = NudeNetDetector.Detect(bmp);
+            return new ScreenReading(scores, nude);
         }
         catch
         {

@@ -99,7 +99,12 @@ public partial class MainWindow : Window
         // O modelo carrega em segundo plano: atualiza o texto "Modelo: ..." quando o estado mudar.
         Action imageStatusHandler = () => Dispatcher.BeginInvoke(new Action(UpdateImageDetectorButton));
         NsfwClassifier.StatusChanged += imageStatusHandler;
-        Closed += (_, _) => NsfwClassifier.StatusChanged -= imageStatusHandler;
+        NudeNetDetector.StatusChanged += imageStatusHandler;
+        Closed += (_, _) =>
+        {
+            NsfwClassifier.StatusChanged -= imageStatusHandler;
+            NudeNetDetector.StatusChanged -= imageStatusHandler;
+        };
         UpdateImageDetectorButton();
         UpdateVirtualizationButton();
         UpdateLocalDnsButton();

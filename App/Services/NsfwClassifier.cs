@@ -45,7 +45,6 @@ public static class NsfwClassifier
     private static int[] _suggestive = { 4 };
     private static int _nOut = 5;
     private static bool _loaded;
-    private static bool _resolverSet;
     private static int _failures;
 
     public static string ModelFolder => Path.Combine(AppContext.BaseDirectory, "nsfw");
@@ -74,35 +73,12 @@ public static class NsfwClassifier
                 return;
             }
 
-            // Antes de tocar no ONNX Runtime: carrega a onnxruntime.dll DA PASTA DO PROGRAMA (por caminho completo) e deixa o
-            // resultado no log. Assim uma DLL de mesmo nome em outro lugar (ex.: do Windows) não é usada por engano, e um
-            // erro de carregamento (ex.: falta o "Visual C++ Redistributable x64") aparece com o motivo, não escondido.
-            var nativeDll = Path.Combine(AppContext.BaseDirectory, "onnxruntime.dll");
-            if (!File.Exists(nativeDll))
+            // Antes de tocar no ONNX Runtime: carrega a onnxruntime.dll da pasta do programa (compartilhada com o NudeNetDetector).
+            var nativeError = OnnxRuntimeLoader.EnsureLoaded();
+            if (nativeError != null)
             {
                 CurrentStatus = Status.BadModel;
-                Detail = "onnxruntime.dll não está em " + AppContext.BaseDirectory;
-                Logger.Log("Detector de imagens: " + Detail);
-                return;
-            }
-            try
-            {
-                NativeLibrary.Load(nativeDll);
-                if (!_resolverSet)
-                {
-                    _resolverSet = true;
-                    NativeLibrary.SetDllImportResolver(typeof(InferenceSession).Assembly, (name, _, _) =>
-                        name.StartsWith("onnxruntime", StringComparison.OrdinalIgnoreCase)
-                        && NativeLibrary.TryLoad(Path.Combine(AppContext.BaseDirectory,
-                            name.EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ? name : name + ".dll"), out var h)
-                            ? h : IntPtr.Zero);
-                }
-            }
-            catch (Exception ex)
-            {
-                CurrentStatus = Status.BadModel;
-                Detail = "a biblioteca nativa não carregou (falta o Visual C++ Redistributable x64?): " + ex.Message;
-                Logger.LogException("NsfwClassifier.biblioteca nativa", ex);
+                Detail = nativeError;
                 return;
             }
 

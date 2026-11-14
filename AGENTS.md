@@ -243,5 +243,10 @@ a cada ~3 s só enquanto há bloqueio.
 - `ImageGuard`: captura suspeita não minimiza; a varredura de confirmação roda em ~0,7 s. Log por classe (suspeita / CONFIRMADA / abaixo do limite, só números) para calibrar.
 - Aba Proteções: botões "Menos rígido / Padrão / Mais rígido" (`ImageSensitivityButton_Click`); diminuir o rigor exige `UninstallFlow.TryAuthorizeRemoval`, aumentar não. `ImageDecision.cs` NÃO entra no `Watchdog.csproj`.
 - O app Android ainda usa a pontuação única antiga: o mesmo ajuste precisa ser espelhado lá (`ImageGuard.kt`/`NsfwClassifier.kt`).
-- Limite conhecido: biquíni e close de rosto compartilham a classe "sexy" deste modelo; separar de verdade exige a "Etapa 2" (detector por regiões, ex.: NudeNet), ainda não feita.
+- Limite conhecido: biquíni e close de rosto compartilham a classe "sexy" deste modelo; separar de verdade exige o detector por regiões (NudeNet, seção seguinte; opcional, precisa de `nudenet.onnx`).
 - 2026-11-14: removidos `App/src/` (Kotlin do Android que reapareceu por engano no projeto do PC) e `diagnostico-dns.txt` (saída antiga já analisada; agora no `.gitignore`).
+
+## Detector de imagens: segunda opinião NudeNet (2026-11-14, NÃO compilado, sem o modelo real)
+- Novos: `App/Services/NudeNetDetector.cs` (ONNX, `Assets/nsfw/nudenet.onnx`, OPCIONAL), `NudeNetDecoder.cs` (puro: saída YOLO `[1,22,N]`/`[1,N,22]` -> exposto/corpo), `OnnxRuntimeLoader.cs` (carrega `onnxruntime.dll` uma vez; o `NsfwClassifier` passou a usá-lo). Regra: `ImageDecision.Refine`/`NudeLimitsFor`/`NudeNetGate`. Testes: `tests/SharkBlocker.ParityTests/NudeNetTests.cs`. Modelo: `scripts/obter-modelo-nudenet.py` (copia do pacote pip `nudenet`; o `.onnx` NÃO está no repositório).
+- Efeito: só-sugestivo sem nenhuma parte do corpo é vetado (close de rosto); parte exposta confirma e sobe o nível; Explícito nunca é vetado (anime). Sem o arquivo nada muda. `ImageGuard` chama o NudeNet só com pontuação total do classificador >= 0,30.
+- Nenhum destes arquivos entra no `Watchdog.csproj`. Detalhes, licença (MIT no pacote, mas modelo treinado com YOLOv8/AGPL) e o que não foi verificado: `docs/DETECTOR-DE-IMAGENS-PC.md`.

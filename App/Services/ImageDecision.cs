@@ -29,6 +29,13 @@ public enum ImageLevel
 public readonly record struct ImageLimits(float Explicit, float Combined, float Immediate);
 
 /// <summary>
+/// Limites da segunda opinião (NudeNet), por sensibilidade (ver <see cref="ImageDecision.NudeLimitsFor"/>):
+/// <see cref="Corroborate"/> = parte exposta que CONFIRMA o classificador; <see cref="NudeOnly"/> = parte exposta forte o bastante
+/// para agir mesmo com o classificador abaixo do limite; <see cref="BodyMin"/> = confiança mínima para contar "há corpo na tela".
+/// </summary>
+public readonly record struct NudeLimits(float Corroborate, float NudeOnly, float BodyMin);
+
+/// <summary>
 /// Regra de decisão do detector de imagens, SEM WinForms/WPF/ONNX (por isso pode ser testada em xUnit).
 /// Só o App usa; o Watchdog não compila este arquivo.
 ///
@@ -39,6 +46,8 @@ public readonly record struct ImageLimits(float Explicit, float Combined, float 
 ///  - explícito muito alto (>= Immediate)         -> trava na hora;
 ///  - só sugestivo (explícito + sexy >= Combined) -> precisa de 3 capturas seguidas e de um limite bem mais alto, para pegar
 ///    biquíni/roupa sugestiva sem pegar um rosto em close.
+/// Com a segunda opinião (NudeNet, opcional) o nível passa por <see cref="Refine"/>: o "só sugestivo" sem nenhuma parte do corpo
+/// na tela é vetado (close de rosto), e parte exposta confirmada sobe o nível.
 /// </summary>
 public static class ImageDecision
 {
@@ -49,6 +58,42 @@ public static class ImageDecision
         3 => new ImageLimits(Explicit: 0.70f, Combined: 0.85f, Immediate: 0.92f),
         _ => new ImageLimits(Explicit: 0.85f, Combined: 0.93f, Immediate: 0.96f),
     };
+
+    /// <summary>O NudeNet só roda (e custa CPU) quando o classificador já deu pontuação total a partir daqui.</summary>
+    public const float NudeNetGate = 0.30f;
+
+    /// <summary>Limites da segunda opinião; mesma convenção de sensibilidade de <see cref="Limits"/>.</summary>
+    public static NudeLimits NudeLimitsFor(int sensitivity) => sensitivity switch
+    {
+        1 => new NudeLimits(Corroborate: 0.50f, NudeOnly: 0.70f, BodyMin: 0.30f),
+        3 => new NudeLimits(Corroborate: 0.30f, NudeOnly: 0.45f, BodyMin: 0.30f),
+        _ => new NudeLimits(Corroborate: 0.40f, NudeOnly: 0.60f, BodyMin: 0.30f),
+    };
+
+    /// <summary>
+    /// Combina o nível do classificador com a segunda opinião (<paramref name="nude"/> = null: sem NudeNet, nada muda).
+    ///  - Imediato continua imediato (rede de segurança: o NudeNet é fraco em anime/hentai, não pode vetar);
+    ///  - Explícito + parte exposta confirmada -> Imediato (os dois modelos concordam); sem confirmação continua Explícito
+    ///    (não veta: pode ser anime);
+    ///  - Sugestivo (só "sexy"): parte exposta confirmada -> Explícito; só corpo coberto/barriga (biquíni) -> continua Sugestivo;
+    ///    NENHUMA parte do corpo (só rosto, paisagem, fundo cor de pele) -> Limpo (veto: é o caso do close de rosto);
+    ///  - Limpo: parte exposta forte (>= NudeOnly) com o classificador já em pontuação total >= <see cref="NudeNetGate"/> -> Explícito.
+    /// </summary>
+    public static ImageLevel Refine(ImageLevel level, ImageScores s, NudeNetResult? nude, NudeLimits limits)
+    {
+        if (nude == null || level == ImageLevel.Immediate) return level;
+
+        switch (level)
+        {
+            case ImageLevel.Explicit:
+                return nude.Exposed >= limits.Corroborate ? ImageLevel.Immediate : ImageLevel.Explicit;
+            case ImageLevel.Suggestive:
+                if (nude.Exposed >= limits.Corroborate) return ImageLevel.Explicit;
+                return nude.Body >= limits.BodyMin ? ImageLevel.Suggestive : ImageLevel.Clean;
+            default:
+                return nude.Exposed >= limits.NudeOnly && s.Total >= NudeNetGate ? ImageLevel.Explicit : ImageLevel.Clean;
+        }
+    }
 
     public static ImageLevel Evaluate(ImageScores s, ImageLimits limits)
     {
@@ -74,6 +119,10 @@ public static class ImageDecision
     public static bool Confirmed(int streak, ImageLevel level) => level != ImageLevel.Clean && streak >= ScansRequired(level);
 
     private static readonly string[] FiveClassNames = { "drawings", "hentai", "neutral", "porn", "sexy" };
+
+    /// <summary>Texto da segunda opinião para o log ("NudeNet exposto 0,00 corpo 0,00 [FACE_FEMALE 0,87]" ou "NudeNet sem resposta").</summary>
+    public static string DescribeNude(NudeNetResult? n) =>
+        n == null ? "NudeNet n/d" : $"NudeNet exposto {n.Exposed:0.00} corpo {n.Body:0.00}" + (n.Summary.Length > 0 ? $" [{n.Summary}]" : "");
 
     /// <summary>Texto só com números para o log: "drawings 0,01 hentai 0,02 ..." (nunca imagem nem conteúdo).</summary>
     public static string Describe(ImageScores s)

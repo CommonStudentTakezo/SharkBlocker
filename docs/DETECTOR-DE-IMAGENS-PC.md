@@ -33,6 +33,40 @@ Espelha o detector do Android: olha a tela, passa por um modelo que roda no PC e
   - `Imagem: abaixo do limite, ...` (no máx. 1 a cada 10 s, só com explícito + sugestivo >= 0,50): **serve para calibrar** (ex.: o close do apresentador de xadrez).
   Para ajustar os limites com casos reais, mande essas linhas dos momentos em que travou sem motivo (ou deixou passar algo).
 
+## Segunda opinião: NudeNet (opcional, 2026-11-14, NÃO compilado nem testado com o modelo real)
+O classificador dá UMA nota para a tela inteira e não distingue biquíni de close de rosto (mesma classe "sexy"). O **NudeNet v3** (YOLOv8,
+320x320) acha **partes do corpo** (exposta/coberta). Com ele, o app decide por região em vez de por nota única.
+- Arquivos: `App/Services/NudeNetDetector.cs` (ONNX; `nsfw\nudenet.onnx`), `NudeNetDecoder.cs` (decodifica a saída, puro, testado),
+  `OnnxRuntimeLoader.cs` (carrega a `onnxruntime.dll` uma vez para os dois detectores). Regra em `ImageDecision.Refine`.
+- **Sem `nudenet.onnx` nada muda**: a aba Proteções mostra "NudeNet (segunda opinião) opcional: coloque ..." e vale a Etapa 1.
+- Só roda quando o classificador já desconfia (pontuação total >= 0,30), para poupar CPU. A imagem vai para um quadrado preto
+  (canto superior esquerdo, sem distorcer) e é reduzida para a entrada do modelo (como o pacote `nudenet` faz).
+- Grupos de classes: **exposto** = seio feminino, genitais, nádegas e ânus EXPOSTOS; **corpo** = os de cima + COBERTOS (genitália,
+  ânus, seio, nádegas), peito masculino e barriga exposta. Rosto, pés e axilas **não contam** (close de rosto = corpo 0).
+- Regra combinada (Padrão; confiança do NudeNet em 0 a 1):
+
+  | Classificador diz | NudeNet vê | Resultado |
+  |---|---|---|
+  | Sugestivo (só "sexy") | nenhuma parte do corpo (corpo < 0,30) | **Limpo** (veto: close de rosto) |
+  | Sugestivo | corpo coberto/barriga (biquíni) | continua Sugestivo (3 capturas) |
+  | Sugestivo | parte exposta >= 0,40 | sobe para Explícito (2 capturas) |
+  | Explícito | parte exposta >= 0,40 | sobe para Imediato (os dois concordam) |
+  | Explícito | nada | continua Explícito (**não veta**: o NudeNet é fraco em anime/hentai) |
+  | Imediato | qualquer | continua Imediato (rede de segurança) |
+  | Limpo, mas total >= 0,30 | parte exposta >= 0,60 | Explícito (o NudeNet pegou o que o classificador deixou) |
+
+  Os limites 0,40 / 0,60 mudam com o rigor (Menos rígido 0,50 / 0,70; Mais rígido 0,30 / 0,45): `ImageDecision.NudeLimitsFor`.
+- Log: as linhas `Imagem:` ganham `| NudeNet exposto 0,00 corpo 0,00 [FACE_MALE 0,93, ...]` (3 maiores detecções >= 0,25; só números).
+- **Obter o modelo** (o arquivo não vem no projeto): no PC, `pip install nudenet` e depois `python scripts\obter-modelo-nudenet.py` (copia o
+  `320n.onnx` do pacote para `App\Assets\nsfw\nudenet.onnx`; aceita também o caminho de um `640m.onnx`, mais preciso e mais lento).
+- **Licença:** o pacote `nudenet` declara MIT, mas o modelo foi treinado com o YOLOv8 da Ultralytics (AGPL-3.0). Uso pessoal: sem problema.
+  Antes de distribuir o SharkBlocker com o arquivo, confira as licenças. (Não consegui verificar o texto da licença do repositório daqui.)
+- **O que NÃO foi verificado:** a ordem dos 18 rótulos e o formato exato da saída `[1,22,N]` vêm da documentação do pacote, não de rodar o
+  modelo; o pré-processamento (quadrado preto + redução com GDI+, não OpenCV) pode dar notas um pouco diferentes das do pacote. Se a aba
+  disser "incompatível", o motivo aparece lá e no log. Confira com imagens neutras (rosto em close, tabuleiro) antes de confiar nos limites.
+- Limite estrutural: 320 px para uma tela inteira é pouco; imagem pequena num canto da tela pode passar despercebida (por isso o
+  classificador continua sendo a primeira linha).
+
 ## Como obter o modelo
 **Já vem pronto** no `pc-modelo-onnx.zip` (`App\Assets\nsfw\model.onnx` + `model.json`): é só extrair na pasta do projeto do PC e compilar.
 Para gerar de novo (não precisa de TensorFlow; só numpy, protobuf e onnxruntime):
@@ -56,7 +90,7 @@ independente em numpy (diferença máxima ~2e-6 em 4 imagens de teste). Não foi
 - Modelos treinados em fotos erram em imagens de IA e ilustração/anime; ainda há falsos positivos e falsos negativos.
 - **Biquíni/roupa sugestiva x close de rosto usam a mesma classe ("sexy")**: não dá para separá-los só com este modelo. O sugestivo tem limite alto e
   exige 3 capturas; isso evita o close de rosto, mas deixa passar biquíni com pontuação mais baixa (use "Mais rígido" e confira o log de calibração).
-  Separar de verdade exige um detector por regiões (NudeNet, "Etapa 2", não implementada).
+  Separar de verdade exige o detector por regiões: a segunda opinião NudeNet (seção acima; opcional, precisa do arquivo do modelo).
 - Mangá em preto e branco costuma cair em "drawings" (seguro); se passar, o log mostra a pontuação para ajustar.
 - Não fecha a janela: só minimiza tudo (Win+M). Se a imagem continuar aberta depois da carência, pode travar de novo.
 - Consumo: uma captura + uma inferência por monitor a cada ~2 s.
