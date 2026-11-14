@@ -73,7 +73,7 @@ public class BlockState
     /// </summary>
     public bool ImageDetectorEnabled { get; set; }
 
-    /// <summary>Sensibilidade do detector: 1 = Cautelosa (0,90), 2 = Padrão (0,80), 3 = Sensível (0,65).</summary>
+    /// <summary>Rigor do detector (limites em ImageDecision.Limits): 1 = menos rígido, 2 = padrão, 3 = mais rígido. Diminuir exige senha na interface.</summary>
     public int ImageSensitivity { get; set; } = 2;
 
     /// <summary>Quantas travas por imagem nas últimas 24 h (escada 5 → 15 → 30 min). Zera sozinha; ver StateManager.StartImageScreenLock.</summary>

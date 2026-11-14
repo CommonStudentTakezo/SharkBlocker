@@ -292,6 +292,43 @@ public partial class MainWindow : Window
             ? "Desativar detector de imagens"
             : "Ativar detector de imagens";
         ImageDetectorStatusText.Text = "Modelo: " + ImageGuard.StatusText();
+        UpdateImageSensitivityButtons();
+    }
+
+    /// <summary>Marca com "●" o rigor em uso (1 = menos rígido, 2 = padrão, 3 = mais rígido; valor inválido conta como padrão).</summary>
+    private void UpdateImageSensitivityButtons()
+    {
+        var current = _state.ImageSensitivity is 1 or 3 ? _state.ImageSensitivity : 2;
+        ImageSensLowButton.Content = (current == 1 ? "● " : "") + "Menos rígido";
+        ImageSensMidButton.Content = (current == 2 ? "● " : "") + "Padrão";
+        ImageSensHighButton.Content = (current == 3 ? "● " : "") + "Mais rígido";
+    }
+
+    private void ImageSensitivityButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_busy) return;
+
+        try
+        {
+            if (sender is not Button { Tag: string tag } || !int.TryParse(tag, out var wanted) || wanted is < 1 or > 3) return;
+
+            var current = _state.ImageSensitivity is 1 or 3 ? _state.ImageSensitivity : 2;
+            if (wanted == current) return;
+
+            // Mais rígido só RESTRINGE mais: sem senha. Menos rígido AFROUXA: trava de tela + senha + confirmações, como desligar.
+            if (wanted < current && !UninstallFlow.TryAuthorizeRemoval(this, "Reduzir o rigor do detector de imagens")) return;
+
+            _state.ImageSensitivity = wanted;
+            StateManager.Save(_state);
+            Logger.Log($"Rigor do detector de imagens: {current} -> {wanted}" + (wanted < current ? " (com senha)." : "."));
+            UpdateImageSensitivityButtons();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MainWindow.ImageSensitivityButton_Click", ex);
+            MessageBox.Show($"Erro ao alterar a opção: {ex.Message}\n\nDetalhes em:\n{Logger.LogFilePath}",
+                "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void ImageDetectorButton_Click(object sender, RoutedEventArgs e)

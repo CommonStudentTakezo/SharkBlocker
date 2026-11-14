@@ -10,3 +10,6 @@ ExtensionSigningKey/*.pem
 # Artefatos
 *.crx
 *.log
+
+# Relatório gerado por diagnostico-dns.ps1 (não versionar)
+diagnostico-dns.txt

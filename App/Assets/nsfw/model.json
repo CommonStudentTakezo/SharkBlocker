@@ -1,9 +1,6 @@
 {
   "scale": 0.00392157,
   "mean": 0.0,
-  "nsfwIndices": [
-    1,
-    3,
-    4
-  ]
+  "explicitIndices": [1, 3],
+  "suggestiveIndices": [4]
 }

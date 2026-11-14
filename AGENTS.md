@@ -235,3 +235,13 @@ a cada ~3 s só enquanto há bloqueio.
 - **YouTube:** só `/shorts` é barrado (regra de caminho em `isYouTubeShorts`/`UrlPolicy`); youtube.com, youtu.be, googlevideo.com e ytimg.com NÃO estão na lista. Os carrosséis de Shorts na página inicial continuam aparecendo (clicar leva à página de bloqueio); esconder exigiria script de conteúdo.
 - **Liberação fixa `music.youtube.com`:** `CTC_ALWAYS_ALLOWED_HOSTS`/`allowedByException` (background.js), `UrlPolicy.cs`, `DnsFilterCore.AlwaysAllowedHosts` e `UrlPolicy.kt`. Continua valendo para youtube.com que a PESSOA coloque na própria lista.
 - `App/Services/DefaultSites.cs` agora é só uma MIGRAÇÃO (versão 2): remove da lista da pessoa as 5 entradas de YouTube que a versão 1 juntou. Para acrescentar sites permanentes, edite `CTC_PERMANENT_SITES` (e os testes), aumente `version` do manifest e recopie para o Android.
+
+## Detector de imagens: menos falsos positivos (2026-11-14, NÃO compilado)
+- Relato: vídeo de xadrez com close do apresentador travou a tela; suspeita de anime/mangá também no Android. A regra antiga somava hentai+porn+sexy e travava com UMA captura >= 0,80; "sexy" reage a rosto em close e tom de pele.
+- `NsfwClassifier.Score` agora devolve `ImageScores` (explícito = porn+hentai, sexy separado, saída completa). `model.json`: `explicitIndices:[1,3]`, `suggestiveIndices:[4]` (o formato antigo `nsfwIndices` ainda é lido). `scripts/converter-modelo-onnx.py` grava o formato novo.
+- `App/Services/ImageDecision.cs` (puro): imediato (explícito >= 0,96, 1 captura), explícito (>= 0,85, 2 capturas seguidas), sugestivo (explícito+sexy >= 0,93, 3 capturas). Tabela por rigor em `ImageDecision.Limits`; testes em `tests/SharkBlocker.ParityTests/ImageDecisionTests.cs`. `ImageGuard.Threshold` foi removido.
+- `ImageGuard`: captura suspeita não minimiza; a varredura de confirmação roda em ~0,7 s. Log por classe (suspeita / CONFIRMADA / abaixo do limite, só números) para calibrar.
+- Aba Proteções: botões "Menos rígido / Padrão / Mais rígido" (`ImageSensitivityButton_Click`); diminuir o rigor exige `UninstallFlow.TryAuthorizeRemoval`, aumentar não. `ImageDecision.cs` NÃO entra no `Watchdog.csproj`.
+- O app Android ainda usa a pontuação única antiga: o mesmo ajuste precisa ser espelhado lá (`ImageGuard.kt`/`NsfwClassifier.kt`).
+- Limite conhecido: biquíni e close de rosto compartilham a classe "sexy" deste modelo; separar de verdade exige a "Etapa 2" (detector por regiões, ex.: NudeNet), ainda não feita.
+- 2026-11-14: removidos `App/src/` (Kotlin do Android que reapareceu por engano no projeto do PC) e `diagnostico-dns.txt` (saída antiga já analisada; agora no `.gitignore`).

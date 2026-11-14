@@ -286,7 +286,7 @@ def main():
     print("Imagem preta -> [drawings, hentai, neutral, porn, sexy] =", np.round(y, 3).tolist())
     if y.shape != (1, 5) or abs(float(y.sum()) - 1.0) > 1e-3:
         sys.exit("Saida inesperada: o modelo nao foi gravado corretamente.")
-    (destino / "model.json").write_text(json.dumps({"scale": 0.00392157, "mean": 0.0, "nsfwIndices": [1, 3, 4]}, indent=2),
+    (destino / "model.json").write_text(json.dumps({"scale": 0.00392157, "mean": 0.0, "explicitIndices": [1, 3], "suggestiveIndices": [4]}, indent=2),
                                         encoding="utf-8")
     print("model.json gravado. Proximo passo: dotnet build -c Release e conferir 'Modelo carregado e pronto'.")
 

@@ -14,11 +14,17 @@ namespace SharkBlocker.Services;
 /// pasta do programa. Sem o modelo o app compila e roda normalmente e o detector fica "Sem modelo".
 ///
 /// Contrato do modelo: entrada FLOAT32 [1,H,H,3] (NHWC, RGB) ou [1,3,H,H] (NCHW); saída FLOAT32 [1,N] de probabilidades.
-/// model.json (opcional; obrigatório se N != 2 e N != 5): {"scale":0.00392157,"mean":0.0,"nsfwIndices":[1,3,4]}
+/// model.json (opcional; obrigatório se N != 2 e N != 5):
+///   {"scale":0.00392157,"mean":0.0,"explicitIndices":[1,3],"suggestiveIndices":[4]}
 ///  - pixel_normalizado = pixel * scale + mean (padrão 1/255 e 0);
-///  - nsfwIndices = classes somadas para formar a pontuação "adulto" (padrão [1,3,4] com 5 classes
-///    [drawings, hentai, neutral, porn, sexy]; [1] com 2 classes).
-/// Nenhuma imagem é salva ou enviada; só a pontuação é usada. Espelha o NsfwClassifier.kt do Android.
+///  - explicitIndices = classes somadas na pontuação "explícita" (padrão [1,3] com 5 classes
+///    [drawings, hentai, neutral, porn, sexy]: hentai + porn; [1] com 2 classes);
+///  - suggestiveIndices = classes somadas na pontuação "sugestiva" (padrão [4] = sexy; vazio com 2 classes).
+///    Elas ficam separadas porque "sexy" dispara com close de rosto e tom de pele: a decisão (ImageDecision) exige
+///    mais do sugestivo do que do explícito;
+///  - nsfwIndices (formato antigo, ainda aceito): tudo explícito, exceto o índice 4 de um modelo de 5 classes (vira sugestivo).
+/// Nenhuma imagem é salva ou enviada; só as pontuações são usadas. Espelha o NsfwClassifier.kt do Android (que ainda usa a
+/// pontuação única antiga).
 /// NÃO pode ser compilado pelo Watchdog (usa WPF/WinForms): não o inclua em Watchdog.csproj.
 /// </summary>
 public static class NsfwClassifier
@@ -35,7 +41,8 @@ public static class NsfwClassifier
     private static bool _nchw;
     private static float _scale = 1f / 255f;
     private static float _mean;
-    private static int[] _nsfw = { 1, 3, 4 };
+    private static int[] _explicit = { 1, 3 };
+    private static int[] _suggestive = { 4 };
     private static int _nOut = 5;
     private static bool _loaded;
     private static bool _resolverSet;
@@ -133,10 +140,36 @@ public static class NsfwClassifier
                     var root = doc.RootElement;
                     if (root.TryGetProperty("scale", out var sc)) _scale = (float)sc.GetDouble();
                     if (root.TryGetProperty("mean", out var mn)) _mean = (float)mn.GetDouble();
-                    if (root.TryGetProperty("nsfwIndices", out var idx) && idx.ValueKind == JsonValueKind.Array)
-                        _nsfw = idx.EnumerateArray().Select(x => x.GetInt32()).ToArray();
+                    var hasNew = false;
+                    if (root.TryGetProperty("explicitIndices", out var expIdx) && expIdx.ValueKind == JsonValueKind.Array)
+                    {
+                        _explicit = expIdx.EnumerateArray().Select(x => x.GetInt32()).ToArray();
+                        hasNew = true;
+                    }
+                    if (root.TryGetProperty("suggestiveIndices", out var sugIdx) && sugIdx.ValueKind == JsonValueKind.Array)
+                    {
+                        _suggestive = sugIdx.EnumerateArray().Select(x => x.GetInt32()).ToArray();
+                        hasNew = true;
+                    }
+                    if (!hasNew && root.TryGetProperty("nsfwIndices", out var idx) && idx.ValueKind == JsonValueKind.Array)
+                    {
+                        // Formato antigo: tudo explícito; o índice 4 de um modelo de 5 classes (sexy) vira sugestivo.
+                        var all = idx.EnumerateArray().Select(x => x.GetInt32()).ToArray();
+                        var sexyIsSuggestive = _nOut == 5;
+                        _explicit = all.Where(i => !(sexyIsSuggestive && i == 4)).ToArray();
+                        _suggestive = sexyIsSuggestive ? all.Where(i => i == 4).ToArray() : Array.Empty<int>();
+                    }
+                    else if (!hasNew && _nOut == 2)
+                    {
+                        _explicit = new[] { 1 };
+                        _suggestive = Array.Empty<int>();
+                    }
                 }
-                else if (_nOut == 2) _nsfw = new[] { 1 };
+                else if (_nOut == 2)
+                {
+                    _explicit = new[] { 1 };
+                    _suggestive = Array.Empty<int>();
+                }
                 else if (_nOut != 5)
                 {
                     CurrentStatus = Status.BadModel;
@@ -148,7 +181,7 @@ public static class NsfwClassifier
                 _inputName = input.Key;
                 _session = session;
                 CurrentStatus = Status.Ready;
-                Detail = $"entrada {_size}x{_size} ({(_nchw ? "NCHW" : "NHWC")}), saída {_nOut} classes, nsfwIndices=[{string.Join(",", _nsfw)}]";
+                Detail = $"entrada {_size}x{_size} ({(_nchw ? "NCHW" : "NHWC")}), saída {_nOut} classes, explicitIndices=[{string.Join(",", _explicit)}], suggestiveIndices=[{string.Join(",", _suggestive)}]";
                 Logger.Log($"Detector de imagens: modelo carregado ({Detail})");
             }
             catch (Exception ex)
@@ -160,8 +193,8 @@ public static class NsfwClassifier
         }
     }
 
-    /// <summary>Pontuação "adulto" de 0 a 1, ou null se o modelo não está pronto/falhou.</summary>
-    public static float? Score(Bitmap source)
+    /// <summary>Pontuações explícita e sugestiva (cada uma de 0 a 1) mais a saída completa, ou null se o modelo não está pronto/falhou.</summary>
+    public static ImageScores? Score(Bitmap source)
     {
         InferenceSession? session;
         lock (Gate) session = _session;
@@ -213,10 +246,12 @@ public static class NsfwClassifier
                 output = exp.Select(v => v / sum).ToArray();
             }
 
-            var s = 0f;
-            foreach (var i in _nsfw) if (i >= 0 && i < output.Length) s += output[i];
+            var explicitScore = 0f;
+            foreach (var i in _explicit) if (i >= 0 && i < output.Length) explicitScore += output[i];
+            var sexyScore = 0f;
+            foreach (var i in _suggestive) if (i >= 0 && i < output.Length) sexyScore += output[i];
             _failures = 0;
-            return Math.Clamp(s, 0f, 1f);
+            return new ImageScores(Math.Clamp(explicitScore, 0f, 1f), Math.Clamp(sexyScore, 0f, 1f), output);
         }
         catch (Exception ex)
         {
