@@ -151,12 +151,24 @@
                                    FontSize="12.5" FontWeight="SemiBold" Margin="0,1,0,0"/>
                     </StackPanel>
 
-                    <!-- Saúde das proteções, em "pílula" -->
-                    <Border Grid.Column="2" VerticalAlignment="Center" CornerRadius="14" Padding="12,5"
-                            Background="#14FFFFFF" BorderBrush="{StaticResource ColorBorder}" BorderThickness="1">
-                        <TextBlock x:Name="HealthText" Text="Verificando proteções..." FontSize="12"
-                                   FontWeight="SemiBold" Foreground="{StaticResource ColorTextMuted}"/>
-                    </Border>
+                    <!-- Sequência e saúde das proteções, em "pílulas" -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border x:Name="HeaderStreakPill" CornerRadius="14" Padding="12,5" Margin="0,0,8,0" Visibility="Collapsed"
+                                Background="#14FFFFFF" BorderBrush="{StaticResource ColorBorder}" BorderThickness="1"
+                                ToolTip="Sua sequência sem tentar burlar (aba Status)">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE945;" FontFamily="{StaticResource IconFont}" FontSize="12" Margin="0,1,6,0"
+                                           Foreground="{StaticResource ColorAccent}" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="HeaderStreakText" FontSize="12" FontWeight="SemiBold"
+                                           Foreground="{StaticResource ColorTextPrimary}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border CornerRadius="14" Padding="12,5"
+                                Background="#14FFFFFF" BorderBrush="{StaticResource ColorBorder}" BorderThickness="1">
+                            <TextBlock x:Name="HealthText" Text="Verificando proteções..." FontSize="12"
+                                       FontWeight="SemiBold" Foreground="{StaticResource ColorTextMuted}"/>
+                        </Border>
+                    </StackPanel>
                 </Grid>
             </Border>
 
@@ -185,7 +197,13 @@
             <TabControl x:Name="MainTabs" Grid.Row="2" SelectionChanged="MainTabs_SelectionChanged">
 
                 <!-- ===================== ABA: BLOQUEIO ===================== -->
-                <TabItem Header="Bloqueio">
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE72E;" FontFamily="{StaticResource IconFont}" FontSize="14" Margin="0,1,7,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Bloqueio" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="24,18,24,24">
 
@@ -302,7 +320,13 @@
 
                 <!-- ============== ABA: PROTEÇÕES PERMANENTES ============== -->
                 <!-- ================ ABA: AGENDA (bloqueios recorrentes) ================ -->
-                <TabItem Header="Agenda">
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE787;" FontFamily="{StaticResource IconFont}" FontSize="14" Margin="0,1,7,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Agenda" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="24,18,24,24">
                             <Border Style="{StaticResource Card}">
@@ -322,7 +346,13 @@
                     </ScrollViewer>
                 </TabItem>
 
-                <TabItem Header="Proteções">
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE83D;" FontFamily="{StaticResource IconFont}" FontSize="14" Margin="0,1,7,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Proteções" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="24,18,24,24">
 
@@ -352,6 +382,8 @@
                                 </StackPanel>
                             </Border>
 
+                            <Expander Header="Proteções opcionais (VPN, detector de imagens, VMs, DNS, anônimo, arquivos da web)" Margin="0,0,0,12" IsExpanded="True">
+                            <StackPanel Margin="0,10,0,0">
                             <Border Style="{StaticResource Card}">
                                 <StackPanel>
                                     <TextBlock Text="VPNs de uso comum (opcional)" Style="{StaticResource SectionHeader}"/>
@@ -423,15 +455,71 @@
                                             HorizontalAlignment="Left" Click="WebArchivesButton_Click"/>
                                 </StackPanel>
                             </Border>
+                            </StackPanel>
+                            </Expander>
 
                         </StackPanel>
                     </ScrollViewer>
                 </TabItem>
 
                 <!-- ================ ABA: STATUS / DIAGNÓSTICO ================ -->
-                <TabItem Header="Status">
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE9D9;" FontFamily="{StaticResource IconFont}" FontSize="14" Margin="0,1,7,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Status" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="24,18,24,24">
+
+                            <!-- Resumo em blocos: o essencial de relance -->
+                            <UniformGrid Columns="4" Margin="0,0,0,12">
+                                <Border Style="{StaticResource Card}" Margin="0,0,8,0" Padding="14,12">
+                                    <StackPanel>
+                                        <TextBlock Text="SEQUÊNCIA" Style="{StaticResource Overline}"/>
+                                        <TextBlock x:Name="TileStreakText" Text="—" FontSize="22" FontWeight="Bold" Margin="0,4,0,0"
+                                                   Foreground="{StaticResource ColorAccent}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource Card}" Margin="0,0,8,0" Padding="14,12">
+                                    <StackPanel>
+                                        <TextBlock Text="RECORDE" Style="{StaticResource Overline}"/>
+                                        <TextBlock x:Name="TileBestText" Text="—" FontSize="22" FontWeight="Bold" Margin="0,4,0,0"
+                                                   Foreground="{StaticResource ColorTextPrimary}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource Card}" Margin="0,0,8,0" Padding="14,12">
+                                    <StackPanel>
+                                        <TextBlock Text="DIAS LIMPOS (30)" Style="{StaticResource Overline}"/>
+                                        <TextBlock x:Name="TileCleanText" Text="—" FontSize="22" FontWeight="Bold" Margin="0,4,0,0"
+                                                   Foreground="{StaticResource ColorSuccess}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Style="{StaticResource Card}" Margin="0" Padding="14,12">
+                                    <StackPanel>
+                                        <TextBlock Text="RECAÍDAS (30 D)" Style="{StaticResource Overline}"/>
+                                        <TextBlock x:Name="TileRelapseText" Text="—" FontSize="22" FontWeight="Bold" Margin="0,4,0,0"
+                                                   Foreground="{StaticResource ColorWarning}"/>
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Diário de recaídas" Style="{StaticResource SectionHeader}"/>
+                                    <TextBlock Text="Anote o que aconteceu (gatilho, o que você fazia, a intensidade da vontade e o que teria ajudado). Registrar uma recaída zera a sequência; anotar só a vontade não."
+                                               Style="{StaticResource HelpText}" TextWrapping="Wrap" Margin="0,6,0,8"/>
+                                    <TextBlock x:Name="JournalSummaryText" TextWrapping="Wrap" LineHeight="20"
+                                               Foreground="{StaticResource ColorTextSecondary}"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                        <Button x:Name="RegisterRelapseButton" Content="Registrar agora" Style="{StaticResource PrimaryButton}"
+                                                Margin="0,0,8,0" Click="RegisterRelapseButton_Click"/>
+                                        <Button x:Name="ViewJournalButton" Content="Ver diário" Style="{StaticResource SecondaryButton}"
+                                                Click="ViewJournalButton_Click"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
 
                             <Border Style="{StaticResource Card}">
                                 <StackPanel>
@@ -486,7 +574,13 @@
                 </TabItem>
 
                 <!-- ===================== ABA: CONTA ===================== -->
-                <TabItem Header="Conta">
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE77B;" FontFamily="{StaticResource IconFont}" FontSize="14" Margin="0,1,7,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Conta" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </TabItem.Header>
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <StackPanel Margin="24,18,24,24">
 

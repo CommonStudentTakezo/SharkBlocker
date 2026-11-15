@@ -1,0 +1,46 @@
+<Window x:Class="SharkBlocker.Dialogs.JournalWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" Height="640" Width="680"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Foreground="{StaticResource ColorTextPrimary}" FontFamily="{StaticResource UiFont}" FontSize="13"
+        UseLayoutRounding="True">
+
+    <Border x:Name="Shell" Style="{StaticResource DialogShell}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Style="{StaticResource DialogHeader}" MouseLeftButtonDown="Chrome_MouseLeftButtonDown">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Assets/shark-glyph.png" Width="26" Height="26" Margin="0,0,12,0"/>
+                    <TextBlock Text="Diário de recaídas" FontFamily="{StaticResource UiFontDisplay}"
+                               FontWeight="SemiBold" FontSize="15" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Grid.Row="1" Margin="24,16,24,4">
+                <TextBlock x:Name="SummaryText" TextWrapping="Wrap" LineHeight="21"
+                           Foreground="{StaticResource ColorTextSecondary}"/>
+                <TextBlock x:Name="InsightText" TextWrapping="Wrap" Margin="0,6,0,0" LineHeight="21"
+                           Foreground="{StaticResource ColorAccent}" FontWeight="SemiBold"/>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+                <StackPanel x:Name="EntriesPanel" Margin="24,0,24,8"/>
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="24,10,24,20">
+                <Button x:Name="AddButton" Content="Registrar agora" MinWidth="150"
+                        Style="{StaticResource PrimaryButton}" Click="AddButton_Click"/>
+                <Button x:Name="CloseButton" Content="Fechar" MinWidth="110" Margin="10,0,0,0" IsCancel="True"
+                        Style="{StaticResource SecondaryButton}" Click="CloseButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

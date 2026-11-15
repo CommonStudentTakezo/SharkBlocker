@@ -77,12 +77,14 @@ public static class ScreenLock
             EllenEventService.CaughtLine() + "\n\n" +
             "A Ellen flagrou uma busca ou página proibida: conteúdo inapropriado, " +
             "um termo da sua lista ou um proxy/VPN.\n\n" +
-            "Por 30 minutos a tela fica travada. Respire, levante, beba água, coma algo doce."),
+            "Por 30 minutos a tela fica travada. Respire, levante, beba água, coma algo doce.\n\n" +
+            "Quando a tela destravar, o diário (aba Status) está lá se quiser anotar o que aconteceu."),
         ReasonImage => ("EXPEDIENTE ENCERRADO",
             EllenEventService.CaughtLine() + "\n\n" +
             "A Ellen viu uma imagem que parece conteúdo adulto na sua tela. Pode ter sido um falso alarme, mas ela prefere errar para o lado seguro.\n\n" +
             "A tela fica travada: 5 minutos na 1ª vez, 15 na 2ª e 30 da 3ª em diante (a contagem zera depois de 24 h sem novos casos). " +
-            "Respire, levante, beba água, coma algo doce."),
+            "Respire, levante, beba água, coma algo doce.\n\n" +
+            "Quando a tela destravar, o diário (aba Status) está lá se quiser anotar o que aconteceu."),
         ReasonUrgency => (UrgencyHeadline,
             "Você pediu uma pausa e eu estou aqui. Hmph... não que eu estivesse esperando por isso.\n\n" +
             "Por 30 minutos a tela fica travada. Respire fundo, levante, beba água, lave o rosto. " +

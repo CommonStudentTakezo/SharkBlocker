@@ -8,7 +8,7 @@ namespace SharkBlocker.Services;
 public sealed class StatsEvent
 {
     public DateTime Utc { get; set; }
-    /// <summary>"search" (busca/endereço barrado) ou "bypass" (tentativa de burlar).</summary>
+    /// <summary>"search" (busca/endereço barrado), "bypass" (tentativa de burlar) ou "relapse" (recaída declarada no diário).</summary>
     public string Kind { get; set; } = "";
     /// <summary>Motivo original da trava (closed, tamper, uninstall, removal, search). Só diagnóstico.</summary>
     public string Reason { get; set; } = "";
@@ -38,7 +38,8 @@ public sealed record StatsSummary(
     int CleanDays30 = 0,
     int TotalDays30 = 0,
     int[]? RiskHours = null,
-    RiskWindow? RiskSuggestion = null);
+    RiskWindow? RiskSuggestion = null,
+    int RelapsesMonth = 0);
 
 /// <summary>Janela de horário (local) com mais ocorrências. <see cref="EndHourExclusive"/> pode ser menor que o início (atravessa a meia-noite).</summary>
 public sealed record RiskWindow(int StartHour, int EndHourExclusive, int Covered, int Total);
@@ -62,6 +63,9 @@ public static class StatsStore
 {
     public const string KindSearch = "search";
     public const string KindBypass = "bypass";
+    /// <summary>Recaída DECLARADA pela própria pessoa no diário: zera a sequência, mas não é "tentativa de burlar".</summary>
+    public const string KindRelapse = "relapse";
+    public const string ReasonRelapse = "relapse";
 
     private static readonly string StatsFile = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "SharkBlocker", "stats.json");
@@ -82,6 +86,7 @@ public static class StatsStore
         // Literais de ScreenLock.ReasonSearch/ReasonUninstall/ReasonRemoval (ScreenLock é só do App).
         "search" or "image" => KindSearch,
         AppPresence.ReasonClosed or AppPresence.ReasonTamper or "uninstall" or "removal" => KindBypass,
+        ReasonRelapse => KindRelapse,
         _ => null
     };
 
@@ -103,7 +108,7 @@ public static class StatsStore
 
                 d.Events.Add(new StatsEvent { Utc = now, Kind = kind, Reason = reason ?? "" });
 
-                if (kind == KindBypass)
+                if (kind == KindBypass || kind == KindRelapse)
                 {
                     var since = d.LastBypassUtc ?? d.FirstSeenUtc;
                     d.BestStreakDays = Math.Max(d.BestStreakDays, Math.Max(0, (now - since).TotalDays));
@@ -117,6 +122,9 @@ public static class StatsStore
         }
         catch (Exception ex) { Logger.LogException("StatsStore.Record", ex); }
     }
+
+    /// <summary>Recaída declarada no diário (zera a sequência). Nunca lança.</summary>
+    public static void RecordRelapse() => Record(ReasonRelapse);
 
     // ---------------------------------------------------------------- tempo bloqueado (Watchdog)
 
@@ -224,13 +232,15 @@ public static class StatsStore
                 blockedWeek += seconds;
         }
 
+        // Dia "sujo" = tentativa de burlar OU recaída declarada.
         var (clean, total) = CleanDays(
-            d.Events.Where(e => e.Kind == KindBypass).Select(e => e.Utc), d.FirstSeenUtc, nowUtc);
+            d.Events.Where(e => e.Kind == KindBypass || e.Kind == KindRelapse).Select(e => e.Utc), d.FirstSeenUtc, nowUtc);
 
-        var hours = HourHistogram(d.Events.Where(e => e.Kind == KindSearch || e.Kind == KindBypass).Select(e => e.Utc));
+        var hours = HourHistogram(d.Events.Where(e => e.Kind == KindSearch || e.Kind == KindBypass || e.Kind == KindRelapse).Select(e => e.Utc));
+        var relapsesMonth = d.Events.Count(e => e.Kind == KindRelapse && e.Utc >= nowUtc.AddDays(-30));
 
         return new StatsSummary(streak, best, searches, bypass, blockedWeek, d.BlockedSecondsTotal, d.FirstSeenUtc, clean, total,
-            hours, SuggestWindow(hours));
+            hours, SuggestWindow(hours), relapsesMonth);
     }
 
     // ---------------------------------------------------------------- mapa de horários de risco (backlog #6)

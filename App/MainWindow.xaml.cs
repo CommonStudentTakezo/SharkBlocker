@@ -959,6 +959,12 @@ public partial class MainWindow : Window
             var s = await Task.Run(() => StatsStore.Snapshot(DateTime.UtcNow));
             var streak = StatsStore.FormatStreak(s.StreakDays);
             StreakValueText.Text = streak;
+            TileStreakText.Text = streak;
+            TileBestText.Text = StatsStore.FormatStreak(s.BestStreakDays);
+            TileCleanText.Text = s.TotalDays30 > 0 ? $"{s.CleanDays30}/{s.TotalDays30}" : "—";
+            TileRelapseText.Text = s.RelapsesMonth.ToString();
+            HeaderStreakText.Text = streak;
+            HeaderStreakPill.Visibility = Visibility.Visible;
             StreakCaptionText.Text = s.StreakDays >= 1 ? "sem tentar burlar" : "sem tentar burlar (recomeçou há pouco)";
             StatsDetailText.Text =
                 $"Recorde: {StatsStore.FormatStreak(s.BestStreakDays)}\n" +
@@ -971,12 +977,65 @@ public partial class MainWindow : Window
                 $"Tempo bloqueado (total): {StatsStore.FormatDuration(s.BlockedSecondsTotal)}\n" +
                 $"Contando desde {s.SinceUtc.ToLocalTime():dd/MM/yyyy}";
             RenderRiskMap(s);
+            await RefreshJournalSummaryAsync();
         }
         catch (Exception ex)
         {
             Logger.LogException("MainWindow.RefreshStatsAsync", ex);
         }
     }
+
+    // ---------- Diário de recaídas ----------
+
+    private async Task RefreshJournalSummaryAsync()
+    {
+        try
+        {
+            var all = await Task.Run(RelapseJournal.LoadAll);
+            if (all.Count == 0)
+            {
+                JournalSummaryText.Text = "Nenhuma anotação ainda.";
+                return;
+            }
+            var j = RelapseJournal.Summarize(all, DateTime.UtcNow);
+            var text = $"{j.Total} anotação(ões), {j.Relapses} recaída(s); {j.Last30Days} nos últimos 30 dias.";
+            if (j.TopTrigger != null) text += $"\nGatilho mais frequente: {j.TopTrigger} ({j.TopTriggerCount}x).";
+            if (j.AverageIntensity > 0) text += $"\nIntensidade média da vontade: {j.AverageIntensity:0.0} de 5.";
+            JournalSummaryText.Text = text;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MainWindow.RefreshJournalSummaryAsync", ex);
+        }
+    }
+
+    private async void RegisterRelapseButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            JournalUi.Open(this, true, RelapseJournal.SourceManual);
+            await RefreshStatsAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MainWindow.RegisterRelapseButton_Click", ex);
+        }
+    }
+
+    private async void ViewJournalButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            JournalUi.ShowList(this);
+            await RefreshStatsAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("MainWindow.ViewJournalButton_Click", ex);
+        }
+    }
+
+    private bool _journalInviteShown; // 1 convite por abertura do app: sem insistir
 
     // ---------- Mapa de horários de risco (backlog #6) ----------
 
@@ -2081,8 +2140,25 @@ public partial class MainWindow : Window
             // Trava de tela pedida de fora (extensão reportou busca inapropriada via Watchdog).
             if (_state.IsScreenLockActive && !ScreenLock.IsShowing)
             {
-                var (headline, message) = ScreenLock.TextFor(_state.ScreenLockReason);
-                ScreenLock.ShowUntil(_state.ScreenLockUntilUtc!.Value, headline, message);
+                var lockReason = _state.ScreenLockReason;
+                var lockUntil = _state.ScreenLockUntilUtc!.Value;
+                var (headline, message) = ScreenLock.TextFor(lockReason);
+                ScreenLock.ShowUntil(lockUntil, headline, message);
+
+                // Convite (uma vez): só se a trava acabou por tempo e foi por busca/imagem.
+                if (!_journalInviteShown && DateTime.UtcNow >= lockUntil && JournalUi.ShouldInviteAfterLock(lockReason))
+                {
+                    _journalInviteShown = true;
+                    Dispatcher.BeginInvoke(new Action(async () =>
+                    {
+                        try
+                        {
+                            JournalUi.InviteAfterLock(this);
+                            await RefreshStatsAsync();
+                        }
+                        catch (Exception ex) { Logger.LogException("MainWindow.InviteAfterLock", ex); }
+                    }), DispatcherPriority.ApplicationIdle);
+                }
             }
 
             // Bloqueio AGENDADO em andamento: a tela fica travada até o fim do bloqueio (a trava refaz-se se cair).
