@@ -44,6 +44,11 @@ public static class HostsFileManager
     private const string SidAdministrators = "*S-1-5-32-544";
     private const string SidUsers = "*S-1-5-32-545";
 
+    // Só direitos de ESCRITA (dados, anexar, atributos estendidos e básicos). O "(W)" simples do icacls também nega SYNCHRONIZE, e aí
+    // ninguém dos grupos Administradores/Usuários (nem o SYSTEM, que tem Administradores no token) consegue nem ABRIR o arquivo para
+    // LER: foi isso que travou o Watchdog (rodada 2026-11-15). Com estes direitos a leitura continua funcionando.
+    private const string DenyWriteRights = "(WD,AD,WEA,WA)";
+
     // "Global\" torna o mutex visível entre sessões/serviços, não só dentro
     // do mesmo processo — é o que sincroniza App (sessão do usuário) e
     // Watchdog (SYSTEM, sessão 0) entre si.
@@ -156,7 +161,7 @@ public static class HostsFileManager
 
                 var intendedBlock = BuildBlockLines(domainList, prefixes);
 
-                var currentLines = File.Exists(HostsPath) ? File.ReadAllLines(HostsPath).ToList() : new List<string>();
+                var currentLines = ReadLinesTolerant();
                 var currentBlock = ExtractMarkedBlock(currentLines, MarkerStart, MarkerEnd);
 
                 // Otimização importante pra listas grandes (dezenas de milhares
@@ -328,8 +333,8 @@ public static class HostsFileManager
                 if (IsAlreadyProtected()) return;
 
                 File.SetAttributes(HostsPath, FileAttributes.ReadOnly | FileAttributes.System);
-                RunIcacls($"\"{HostsPath}\" /deny {SidAdministrators}:(W)");
-                RunIcacls($"\"{HostsPath}\" /deny {SidUsers}:(W)");
+                RunIcacls($"\"{HostsPath}\" /deny {SidAdministrators}:{DenyWriteRights}");
+                RunIcacls($"\"{HostsPath}\" /deny {SidUsers}:{DenyWriteRights}");
             }
             catch (Exception ex)
             {
@@ -397,8 +402,8 @@ public static class HostsFileManager
             if (IsAlreadyProtected()) return;
 
             File.SetAttributes(HostsPath, FileAttributes.ReadOnly | FileAttributes.System);
-            RunIcacls($"\"{HostsPath}\" /deny {SidAdministrators}:(W)");
-            RunIcacls($"\"{HostsPath}\" /deny {SidUsers}:(W)");
+            RunIcacls($"\"{HostsPath}\" /deny {SidAdministrators}:{DenyWriteRights}");
+            RunIcacls($"\"{HostsPath}\" /deny {SidUsers}:{DenyWriteRights}");
         }
         catch (Exception ex)
         {
@@ -427,6 +432,23 @@ public static class HostsFileManager
                 Logger.LogException("HostsFileManager.ResetAcl", ex);
             }
         });
+    }
+
+    /// <summary>
+    /// Lê o hosts mesmo que uma proteção ANTIGA (negação que incluía SYNCHRONIZE) impeça até a leitura: nesse caso tira a proteção,
+    /// lê e a recoloca (com os direitos novos). Quem for escrever chama UnprotectInternal de novo. Só dentro de WithHostsLock.
+    /// </summary>
+    private static List<string> ReadLinesTolerant()
+    {
+        if (!File.Exists(HostsPath)) return new List<string>();
+        try { return File.ReadAllLines(HostsPath).ToList(); }
+        catch (UnauthorizedAccessException)
+        {
+            UnprotectInternal();
+            var lines = File.ReadAllLines(HostsPath).ToList();
+            ProtectInternal();
+            return lines;
+        }
     }
 
     private static DateTime _lastStateLogUtc = DateTime.MinValue;
@@ -525,7 +547,7 @@ public static class HostsFileManager
             {
                 var intendedBlock = entryListSnapshot.Select(e => $"{e.Ip} {e.Domain}").ToList();
 
-                var currentLines = File.Exists(HostsPath) ? File.ReadAllLines(HostsPath).ToList() : new List<string>();
+                var currentLines = ReadLinesTolerant();
                 var currentBlock = ExtractMarkedBlock(currentLines, SafeSearchMarkerStart, SafeSearchMarkerEnd);
 
                 if (currentBlock != null && currentBlock.SequenceEqual(intendedBlock))

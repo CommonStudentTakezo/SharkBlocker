@@ -118,14 +118,14 @@ public class NudeNetTests
     [Fact]
     public void Sugestivo_ComParteExposta_SobeParaExplicito()
     {
-        Assert.Equal(ImageLevel.Explicit, ImageDecision.Refine(ImageLevel.Suggestive, GTotal(0.95f), N(0.45f, 0.45f), L));
+        Assert.Equal(ImageLevel.Explicit, ImageDecision.Refine(ImageLevel.Suggestive, GTotal(0.95f), N(0.60f, 0.60f), L));
     }
 
     [Fact]
     public void Explicito_NaoEhVetado_PodeSerAnime_MasConfirmadoViraImediato()
     {
         Assert.Equal(ImageLevel.Explicit, ImageDecision.Refine(ImageLevel.Explicit, GTotal(0.9f), N(0f, 0f), L));
-        Assert.Equal(ImageLevel.Immediate, ImageDecision.Refine(ImageLevel.Explicit, GTotal(0.9f), N(0.45f, 0.45f), L));
+        Assert.Equal(ImageLevel.Immediate, ImageDecision.Refine(ImageLevel.Explicit, GTotal(0.9f), N(0.60f, 0.60f), L));
     }
 
     [Fact]
@@ -161,6 +161,14 @@ public class NudeNetTests
         var l = ImageDecision.NudeLimitsFor(sens);
         Assert.True(l.Corroborate < l.NudeOnly);
         Assert.True(l.BodyMin > 0f);
+    }
+
+    [Fact]
+    public void CachorroNaoViraImediato_LeituraFracaDoNudeNetNaoConfirma()
+    {
+        // Caso real (log de 2026-11-15): classificador explícito 0,91 e NudeNet "seio exposto" 0,38 num vídeo de cachorro.
+        foreach (var sens in new[] { 1, 2, 3 })
+            Assert.Equal(ImageLevel.Explicit, ImageDecision.Refine(ImageLevel.Explicit, GTotal(0.91f), N(0.38f, 0.38f), ImageDecision.NudeLimitsFor(sens)));
     }
 
     [Fact]

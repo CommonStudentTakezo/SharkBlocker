@@ -49,13 +49,13 @@ O classificador dá UMA nota para a tela inteira e não distingue biquíni de cl
   |---|---|---|
   | Sugestivo (só "sexy") | nenhuma parte do corpo (corpo < 0,30) | **Limpo** (veto: close de rosto) |
   | Sugestivo | corpo coberto/barriga (biquíni) | continua Sugestivo (3 capturas) |
-  | Sugestivo | parte exposta >= 0,40 | sobe para Explícito (2 capturas) |
-  | Explícito | parte exposta >= 0,40 | sobe para Imediato (os dois concordam) |
+  | Sugestivo | parte exposta >= 0,55 | sobe para Explícito (2 capturas) |
+  | Explícito | parte exposta >= 0,55 | sobe para Imediato (os dois concordam) |
   | Explícito | nada | continua Explícito (**não veta**: o NudeNet é fraco em anime/hentai) |
   | Imediato | qualquer | continua Imediato (rede de segurança) |
   | Limpo, mas total >= 0,30 | parte exposta >= 0,60 | Explícito (o NudeNet pegou o que o classificador deixou) |
 
-  Os limites 0,40 / 0,60 mudam com o rigor (Menos rígido 0,50 / 0,70; Mais rígido 0,30 / 0,45): `ImageDecision.NudeLimitsFor`.
+  Os limites 0,55 / 0,60 mudam com o rigor (Menos rígido 0,65 / 0,70; Mais rígido 0,45 / 0,50; subiram em 15/11/2026 depois de um falso positivo em vídeo de cachorro com "seio exposto" 0,38): `ImageDecision.NudeLimitsFor`.
 - Log: as linhas `Imagem:` ganham `| NudeNet exposto 0,00 corpo 0,00 [FACE_MALE 0,93, ...]` (3 maiores detecções >= 0,25; só números).
 - **Obter o modelo** (o arquivo não vem no projeto): no PC, `pip install nudenet` e depois `python scripts\obter-modelo-nudenet.py` (copia o
   `320n.onnx` do pacote para `App\Assets\nsfw\nudenet.onnx`; aceita também o caminho de um `640m.onnx`, mais preciso e mais lento).

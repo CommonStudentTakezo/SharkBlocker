@@ -65,9 +65,11 @@ public static class ImageDecision
     /// <summary>Limites da segunda opinião; mesma convenção de sensibilidade de <see cref="Limits"/>.</summary>
     public static NudeLimits NudeLimitsFor(int sensitivity) => sensitivity switch
     {
-        1 => new NudeLimits(Corroborate: 0.50f, NudeOnly: 0.70f, BodyMin: 0.30f),
-        3 => new NudeLimits(Corroborate: 0.30f, NudeOnly: 0.45f, BodyMin: 0.30f),
-        _ => new NudeLimits(Corroborate: 0.40f, NudeOnly: 0.60f, BodyMin: 0.30f),
+        // Corroborate subiu em 2026-11-15: um vídeo de cachorro deu porn 0,90 no classificador e "seio exposto" 0,38 no NudeNet; com
+        // Corroborate 0,30 (Mais rígido) isso virava Imediato e travava na hora. Confirmar exige uma leitura mais firme do NudeNet.
+        1 => new NudeLimits(Corroborate: 0.65f, NudeOnly: 0.70f, BodyMin: 0.30f),
+        3 => new NudeLimits(Corroborate: 0.45f, NudeOnly: 0.50f, BodyMin: 0.30f),
+        _ => new NudeLimits(Corroborate: 0.55f, NudeOnly: 0.60f, BodyMin: 0.30f),
     };
 
     /// <summary>
