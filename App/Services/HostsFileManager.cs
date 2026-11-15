@@ -442,7 +442,8 @@ public static class HostsFileManager
             {
                 if (r.AccessControlType != System.Security.AccessControl.AccessControlType.Deny) continue;
                 if (!AdminSid.Equals(r.IdentityReference) && !UsersSid.Equals(r.IdentityReference)) continue;
-                if (sec.RemoveAccessRuleSpecific(r)) removed++;
+                sec.RemoveAccessRuleSpecific(r); // devolve void; o resultado é conferido por IsAlreadyUnprotected depois
+                removed++;
             }
             if (removed == 0) return;
             fi.SetAccessControl(sec);
