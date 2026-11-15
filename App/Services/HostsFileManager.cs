@@ -203,6 +203,7 @@ public static class HostsFileManager
             catch (Exception ex)
             {
                 Logger.LogException("HostsFileManager.ApplyBlockedSites", ex);
+                if (ex is UnauthorizedAccessException) LogHostsStateThrottled();
                 captured = ex;
             }
         });
@@ -428,6 +429,35 @@ public static class HostsFileManager
         });
     }
 
+    private static DateTime _lastStateLogUtc = DateTime.MinValue;
+
+    /// <summary>
+    /// Diagnóstico de "acesso negado" no hosts (rodada 2026-11-15): 1 linha com quem somos, atributos, dono e todas as regras da ACL,
+    /// no máximo a cada 10 min (o Watchdog tenta a cada 5 s e antes enchia o log só com o mesmo erro). Nunca lança.
+    /// </summary>
+    private static void LogHostsStateThrottled()
+    {
+        try
+        {
+            if (DateTime.UtcNow - _lastStateLogUtc < TimeSpan.FromMinutes(10)) return;
+            _lastStateLogUtc = DateTime.UtcNow;
+
+            var who = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            var attrs = File.GetAttributes(HostsPath);
+            var sec = new FileInfo(HostsPath).GetAccessControl(
+                System.Security.AccessControl.AccessControlSections.Access | System.Security.AccessControl.AccessControlSections.Owner);
+            var owner = sec.GetOwner(typeof(System.Security.Principal.NTAccount));
+            var rules = sec.GetAccessRules(true, true, typeof(System.Security.Principal.NTAccount))
+                .Cast<System.Security.AccessControl.FileSystemAccessRule>()
+                .Select(r => $"{(r.AccessControlType == System.Security.AccessControl.AccessControlType.Deny ? "NEGA" : "permite")} {r.IdentityReference} {r.FileSystemRights}{(r.IsInherited ? " (herdada)" : "")}");
+            Logger.Log($"hosts (acesso negado) como {who}: atributos {attrs}; dono {owner}; ACL: {string.Join(" | ", rules)}");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("HostsFileManager.LogHostsStateThrottled", ex);
+        }
+    }
+
     /// <summary>Remove as negações explícitas de Administradores/Usuários pela API de ACL (plano B do icacls). Nunca lança.</summary>
     private static void RemoveDenyRulesViaAcl()
     {
@@ -524,6 +554,7 @@ public static class HostsFileManager
             catch (Exception ex)
             {
                 Logger.LogException("HostsFileManager.ApplySafeSearchEntries", ex);
+                if (ex is UnauthorizedAccessException) LogHostsStateThrottled();
             }
         });
     }
