@@ -257,3 +257,7 @@ a cada ~3 s só enquanto há bloqueio.
 - Privacidade (limite): arquivo sem criptografia e legível por outras contas do Windows (pasta: Users só leitura). Nada vai ao log, à extensão ou ao Android.
 - Interface: aba Status com blocos (sequência/recorde/dias limpos/recaídas 30 d) e cartão do diário; pílula de sequência no cabeçalho; ícones nas abas; "Proteções opcionais" em seção recolhível; texto da trava (busca/imagem) cita o diário.
 - Não verificado: nada foi compilado nem visto na tela (WPF). Rodar `dotnet build` e `dotnet test` e conferir o visual.
+
+## hosts: negação de escrita que o icacls não removia (2026-11-15, NÃO compilado)
+- Sintoma (app.log do usuário): `UnauthorizedAccessException ... drivers\etc\hosts` a cada 5 s no Watchdog (2.528 vezes em 16 h), inclusive em `ApplyBlockedSites` durante um bloqueio. O Watchdog era SYSTEM (confirmado), mas o token do SYSTEM inclui Administradores, então a negação `Write` explícita de Administradores/Usuários também o barrava. `icacls /remove:d` saía com código 0 e a negação continuava (não explicado).
+- Correção: `HostsFileManager.RemoveDenyRulesViaAcl()` (API de ACL do .NET) roda em `UnprotectInternal` quando ainda há negação depois do icacls. Loga "removi N regra(s) pela API de ACL". Ainda não verificado no PC do usuário.

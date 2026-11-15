@@ -428,6 +428,32 @@ public static class HostsFileManager
         });
     }
 
+    /// <summary>Remove as negações explícitas de Administradores/Usuários pela API de ACL (plano B do icacls). Nunca lança.</summary>
+    private static void RemoveDenyRulesViaAcl()
+    {
+        try
+        {
+            if (!File.Exists(HostsPath)) return;
+            var fi = new FileInfo(HostsPath);
+            var sec = fi.GetAccessControl(System.Security.AccessControl.AccessControlSections.Access);
+            var removed = 0;
+            foreach (System.Security.AccessControl.FileSystemAccessRule r in
+                     sec.GetAccessRules(true, false, typeof(System.Security.Principal.SecurityIdentifier)))
+            {
+                if (r.AccessControlType != System.Security.AccessControl.AccessControlType.Deny) continue;
+                if (!AdminSid.Equals(r.IdentityReference) && !UsersSid.Equals(r.IdentityReference)) continue;
+                if (sec.RemoveAccessRuleSpecific(r)) removed++;
+            }
+            if (removed == 0) return;
+            fi.SetAccessControl(sec);
+            Logger.Log($"hosts: o icacls não removeu a negação de escrita; removi {removed} regra(s) pela API de ACL.");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogException("HostsFileManager.RemoveDenyRulesViaAcl", ex);
+        }
+    }
+
     public static void Unprotect() => WithHostsLock(UnprotectInternal);
 
     /// <summary>Versão "crua", sem adquirir o lock de novo — usada pelos métodos que já estão dentro de WithHostsLock.</summary>
@@ -440,6 +466,10 @@ public static class HostsFileManager
 
             RunIcacls($"\"{HostsPath}\" /remove:d {SidAdministrators}");
             RunIcacls($"\"{HostsPath}\" /remove:d {SidUsers}");
+            // Rodada 2026-11-15: no PC do usuário o "icacls /remove:d" saía com código 0 e a negação continuava (o Watchdog,
+            // que é SYSTEM mas tem o grupo Administradores no token, ficava barrado a cada 5 s). Se ainda há negação, remove-a
+            // direto pela API de ACL do .NET (não depende do icacls).
+            if (!IsAlreadyUnprotected()) RemoveDenyRulesViaAcl();
             if (File.Exists(HostsPath))
             {
                 var attrs = File.GetAttributes(HostsPath);
