@@ -55,6 +55,14 @@ foreach ($k in @("HKLM:\SOFTWARE\Policies\Google\Chrome", "HKLM:\SOFTWARE\Polici
 }
 Add-Line "Confira tambem no Chrome: chrome://settings/security > 'Usar DNS seguro'. Se estiver com um provedor personalizado, desligue ou deixe 'Automatico'."
 
+Section "9) Arquivo hosts (o Cliente DNS do Windows le este arquivo; se a conta dele nao puder abri-lo, os sites dao erro de DNS)"
+$hp = Join-Path $env:WINDIR "System32\drivers\etc\hosts"
+Try-Run "hosts atributos" { (Get-Item -LiteralPath $hp -Force).Attributes }
+Try-Run "hosts acl" { (Get-Acl -LiteralPath $hp).Access | Format-Table IdentityReference, AccessControlType, FileSystemRights, IsInherited -AutoSize }
+Section "10) Servico Cliente DNS (Dnscache) e erros recentes dele"
+Try-Run "dnscache" { Get-Service Dnscache | Format-Table Status, StartType, Name -AutoSize }
+Try-Run "eventos" { Get-WinEvent -FilterHashtable @{ LogName = 'System'; ProviderName = 'Microsoft-Windows-DNS-Client'; Level = 2,3 } -MaxEvents 8 -ErrorAction SilentlyContinue | Format-List TimeCreated, Id, Message }
+
 $lines | Set-Content -LiteralPath $out -Encoding UTF8
 Write-Host ""
 Write-Host "Relatorio gravado em: $out" -ForegroundColor Green
