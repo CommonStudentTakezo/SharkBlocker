@@ -297,6 +297,28 @@ public static class StateManager
     });
 
     /// <summary>
+    /// Trava de tela de duração FIXA pedida pela própria pessoa (compromisso de 1 h do remover-modo-teste.ps1). Se já houver trava
+    /// que dura MAIS que esta, mantém; se dura menos, ESTENDE até agora + <paramref name="duration"/> (sem mudar o motivo). Nunca
+    /// encurta uma trava existente. Não entra nas estatísticas.
+    /// </summary>
+    public static DateTime StartOrExtendScreenLock(TimeSpan duration, string reason) => WithStateLock(() =>
+    {
+        var state = Load();
+        var until = DateTime.UtcNow + duration;
+        if (state.IsScreenLockActive)
+        {
+            if (state.ScreenLockUntilUtc!.Value >= until) return state.ScreenLockUntilUtc.Value;
+        }
+        else
+        {
+            state.ScreenLockReason = reason;
+        }
+        state.ScreenLockUntilUtc = until;
+        SaveCore(state, overwriteScreenLock: true);
+        return until;
+    });
+
+    /// <summary>
     /// Trava por IMAGEM com punição em escada, de forma atômica: 1ª vez 5 min, 2ª 15 min, da 3ª em diante 30 min
     /// (<see cref="ScreenLockPenalty"/>). A contagem fica no estado (reabrir o app não zera) e recomeça depois de 24 h sem
     /// nenhuma trava por imagem. Se já houver trava em andamento, só registra a estatística e não conta como nova.

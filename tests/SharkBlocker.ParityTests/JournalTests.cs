@@ -107,5 +107,6 @@ public class JournalTests
         Assert.Equal(StatsStore.KindSearch, StatsStore.KindFor("search"));
         Assert.Equal(StatsStore.KindBypass, StatsStore.KindFor("uninstall"));
         Assert.Null(StatsStore.KindFor("urgency"));
+        Assert.Null(StatsStore.KindFor("removal-wait")); // compromisso de 1 h do remover-modo-teste.ps1: não conta como burla
     }
 }

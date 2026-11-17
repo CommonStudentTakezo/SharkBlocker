@@ -56,6 +56,8 @@ public static class ScreenLock
     public const string ReasonSearch = "search";
     public const string ReasonImage = "image";
     public const string ReasonRemoval = "removal";
+    /// <summary>Compromisso de 1 h antes de remover o app do celular (remover-modo-teste.ps1 --lock-removal). Não conta como burla.</summary>
+    public const string ReasonRemovalWait = "removal-wait";
     public const string ReasonSchedule = "schedule";
     public const string ReasonClosed = AppPresence.ReasonClosed;
     public const string ReasonTamper = AppPresence.ReasonTamper;
@@ -101,6 +103,10 @@ public static class ScreenLock
             "Você pediu para ALTERAR os bloqueios agendados.\n\n" +
             "Por 30 minutos a tela fica travada. Depois disso, se ainda quiser mudar, vai precisar da senha. " +
             "A agenda continua como está até lá."),
+        ReasonRemovalWait => ("ELLEN IS WATCHING",
+            "Você pediu para REMOVER o SharkBlocker do celular.\n\n" +
+            "Por 1 hora a tela fica travada, com o celular conectado. Nada será removido antes disso. " +
+            "Use o tempo para pensar com calma; se mudar de ideia, é só desconectar o celular ou parar o script."),
         ReasonRemoval => ("ELLEN IS WATCHING",
             "Você tentou REMOVER algo que está na lista de bloqueio.\n\n" +
             "Por 30 minutos a tela fica travada. Depois disso, se ainda quiser mesmo remover, " +

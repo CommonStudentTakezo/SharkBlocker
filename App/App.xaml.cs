@@ -59,6 +59,40 @@ public partial class App : Application
             return;
         }
 
+        // Trava de tela de 1 h pedida pelo remover-modo-teste.ps1 (compromisso antes de remover o app do celular):
+        //   SharkBlocker.exe --lock-removal 60     (minutos; padrão 60; entre 1 e 240)
+        // Só grava a trava no estado (assinado) e sai: quem mostra a tela é o app que já roda (Timer_Tick) ou, se ele não estiver
+        // aberto, o Watchdog, que o reabre quando há trava ativa. Saída 0 = a trava está gravada e vale; 1 = não deu (sem admin etc.).
+        // Sem janela de propósito: o script o chama oculto e uma caixa de mensagem o deixaria esperando.
+        var lockRemovalIndex = Array.IndexOf(e.Args, "--lock-removal");
+        if (lockRemovalIndex >= 0)
+        {
+            var minutes = 60;
+            if (lockRemovalIndex + 1 < e.Args.Length && int.TryParse(e.Args[lockRemovalIndex + 1], out var parsedMinutes))
+                minutes = Math.Clamp(parsedMinutes, 1, 240);
+
+            var ok = false;
+            try
+            {
+                if (ElevationHelper.IsAdministrator())
+                {
+                    var until = StateManager.StartOrExtendScreenLock(TimeSpan.FromMinutes(minutes), ScreenLock.ReasonRemovalWait);
+                    // Confere no estado lido de volta (a gravação é assinada; se falhou, não afirma que travou).
+                    var check = StateManager.Load();
+                    ok = check.IsScreenLockActive && check.ScreenLockUntilUtc!.Value >= DateTime.UtcNow.AddMinutes(minutes - 1);
+                    Logger.Log($"--lock-removal {minutes}: trava gravada até {until.ToLocalTime():HH:mm} (conferida: {ok}).");
+                }
+                else
+                {
+                    Logger.Log("--lock-removal: sem permissão de administrador; nada foi feito.");
+                }
+            }
+            catch (Exception ex) { Logger.LogException("App.OnStartup (--lock-removal)", ex); }
+
+            Shutdown(ok ? 0 : 1);
+            return;
+        }
+
         if (e.Args.Contains("--uninstall"))
         {
             var authorized = UninstallFlow.TryPerformProtectedUninstall(null);
