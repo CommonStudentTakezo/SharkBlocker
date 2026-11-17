@@ -10,6 +10,12 @@ public sealed record ImageScores(float Explicit, float Sexy, float[] Raw)
 {
     /// <summary>Explícito + sugestivo (equivale à pontuação única usada antes da rodada de 2026-11-14).</summary>
     public float Total => Math.Clamp(Explicit + Sexy, 0f, 1f);
+
+    /// <summary>
+    /// true quando o explícito é de FOTO (porn > hentai, modelo de 5 classes na ordem drawings, hentai, neutral, porn, sexy). É onde o
+    /// NudeNet é confiável; em anime/mangá (hentai) ele é fraco e não pode contradizer o classificador.
+    /// </summary>
+    public bool PhotoLike => Raw.Length == 5 && Raw[3] > Raw[1];
 }
 
 /// <summary>Nível de uma captura, do menor para o maior.</summary>
@@ -62,6 +68,9 @@ public static class ImageDecision
     /// <summary>O NudeNet só roda (e custa CPU) quando o classificador já deu pontuação total a partir daqui.</summary>
     public const float NudeNetGate = 0.30f;
 
+    /// <summary>Fração do limite de confirmação a partir da qual um explícito de FOTO ainda conta (como Sugestivo) sem o NudeNet confirmar.</summary>
+    public const float WeakFraction = 0.75f;
+
     /// <summary>Limites da segunda opinião; mesma convenção de sensibilidade de <see cref="Limits"/>.</summary>
     public static NudeLimits NudeLimitsFor(int sensitivity) => sensitivity switch
     {
@@ -75,8 +84,9 @@ public static class ImageDecision
     /// <summary>
     /// Combina o nível do classificador com a segunda opinião (<paramref name="nude"/> = null: sem NudeNet, nada muda).
     ///  - Imediato continua imediato (rede de segurança: o NudeNet é fraco em anime/hentai, não pode vetar);
-    ///  - Explícito + parte exposta confirmada -> Imediato (os dois modelos concordam); sem confirmação continua Explícito
-    ///    (não veta: pode ser anime);
+    ///  - Explícito + parte exposta confirmada -> Imediato (os dois modelos concordam); sem confirmação: se for FOTO
+    ///    (<see cref="ImageScores.PhotoLike"/>) vira Limpo (leitura fraca) ou Sugestivo (intermediária); se for anime/hentai continua
+    ///    Explícito (o NudeNet é fraco ali);
     ///  - Sugestivo (só "sexy"): parte exposta confirmada -> Explícito; só corpo coberto/barriga (biquíni) -> continua Sugestivo;
     ///    NENHUMA parte do corpo (só rosto, paisagem, fundo cor de pele) -> Limpo (veto: é o caso do close de rosto);
     ///  - Limpo: parte exposta forte (>= NudeOnly) com o classificador já em pontuação total >= <see cref="NudeNetGate"/> -> Explícito.
@@ -88,7 +98,11 @@ public static class ImageDecision
         switch (level)
         {
             case ImageLevel.Explicit:
-                return nude.Exposed >= limits.Corroborate ? ImageLevel.Immediate : ImageLevel.Explicit;
+                if (nude.Exposed >= limits.Corroborate) return ImageLevel.Immediate;
+                if (!s.PhotoLike) return ImageLevel.Explicit; // anime/mangá: o NudeNet é fraco, não contradiz
+                // FOTO sem confirmação do NudeNet (caso real de 2026-11-15: rosto de cachorro em close deu porn 0,90 e "seio exposto" 0,38):
+                // leitura fraca = Limpo; leitura intermediária = só Sugestivo (3 capturas seguidas), nunca trava com 2.
+                return nude.Exposed >= limits.Corroborate * WeakFraction ? ImageLevel.Suggestive : ImageLevel.Clean;
             case ImageLevel.Suggestive:
                 if (nude.Exposed >= limits.Corroborate) return ImageLevel.Explicit;
                 return nude.Body >= limits.BodyMin ? ImageLevel.Suggestive : ImageLevel.Clean;

@@ -51,6 +51,8 @@ O classificador dá UMA nota para a tela inteira e não distingue biquíni de cl
   | Sugestivo | corpo coberto/barriga (biquíni) | continua Sugestivo (3 capturas) |
   | Sugestivo | parte exposta >= 0,55 | sobe para Explícito (2 capturas) |
   | Explícito | parte exposta >= 0,55 | sobe para Imediato (os dois concordam) |
+  | Explícito de **foto** (porn > hentai) | parte exposta abaixo de 0,55 | leitura < ~0,41: **Limpo**; entre ~0,41 e 0,55: só **Sugestivo** (3 capturas). Caso real: rosto de cachorro em close, porn 0,90 e "seio exposto" 0,38 |
+  | Explícito de **anime/hentai** (hentai >= porn) | sem confirmação | continua **Explícito** (o NudeNet é fraco em desenho) |
   | Explícito | nada | continua Explícito (**não veta**: o NudeNet é fraco em anime/hentai) |
   | Imediato | qualquer | continua Imediato (rede de segurança) |
   | Limpo, mas total >= 0,30 | parte exposta >= 0,60 | Explícito (o NudeNet pegou o que o classificador deixou) |

@@ -163,12 +163,34 @@ public class NudeNetTests
         Assert.True(l.BodyMin > 0f);
     }
 
+    // Caso real (log de 2026-11-15): rosto de cachorro em close: porn 0,90 no classificador e "seio exposto" 0,38 no NudeNet.
+    private static readonly ImageScores DogFace = new(0.91f, 0f, new[] { 0f, 0.01f, 0.08f, 0.90f, 0f });
+    private static readonly ImageScores Anime = new(0.91f, 0f, new[] { 0f, 0.90f, 0.08f, 0.01f, 0f });
+
     [Fact]
-    public void CachorroNaoViraImediato_LeituraFracaDoNudeNetNaoConfirma()
+    public void RostoDeCachorro_NaoTravaNoPadrao_NemNoMenosRigido()
     {
-        // Caso real (log de 2026-11-15): classificador explícito 0,91 e NudeNet "seio exposto" 0,38 num vídeo de cachorro.
+        foreach (var sens in new[] { 1, 2 })
+            Assert.Equal(ImageLevel.Clean, ImageDecision.Refine(ImageLevel.Explicit, DogFace, N(0.38f, 0.38f), ImageDecision.NudeLimitsFor(sens)));
+    }
+
+    [Fact]
+    public void RostoDeCachorro_NoMaisRigido_VirariaSugestivoNuncaImediato()
+    {
+        Assert.Equal(ImageLevel.Suggestive, ImageDecision.Refine(ImageLevel.Explicit, DogFace, N(0.38f, 0.38f), ImageDecision.NudeLimitsFor(3)));
+    }
+
+    [Fact]
+    public void FotoExplicita_LeituraIntermediariaDoNudeNet_ViraSugestivo()
+    {
+        Assert.Equal(ImageLevel.Suggestive, ImageDecision.Refine(ImageLevel.Explicit, DogFace, N(0.45f, 0.45f), L));
+    }
+
+    [Fact]
+    public void AnimeExplicito_SemConfirmacaoDoNudeNet_ContinuaExplicito()
+    {
         foreach (var sens in new[] { 1, 2, 3 })
-            Assert.Equal(ImageLevel.Explicit, ImageDecision.Refine(ImageLevel.Explicit, GTotal(0.91f), N(0.38f, 0.38f), ImageDecision.NudeLimitsFor(sens)));
+            Assert.Equal(ImageLevel.Explicit, ImageDecision.Refine(ImageLevel.Explicit, Anime, N(0f, 0f), ImageDecision.NudeLimitsFor(sens)));
     }
 
     [Fact]
