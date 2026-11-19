@@ -324,6 +324,7 @@ public static class HostsFileManager
     /// <summary>Nega escrita p/ Usuários e Administradores. Seguro de chamar a qualquer momento.</summary>
     public static void Protect()
     {
+        if (IsProtectionSuspended) return;
         WithHostsLock(() =>
         {
             try
@@ -396,6 +397,7 @@ public static class HostsFileManager
     /// <summary>Versão interna de Protect que não adquire o lock novamente — usada por métodos que já estão dentro de WithHostsLock.</summary>
     private static void ProtectInternal()
     {
+        if (IsProtectionSuspended) return;
         try
         {
             if (!File.Exists(HostsPath)) return;
@@ -449,6 +451,34 @@ public static class HostsFileManager
             ProtectInternal();
             return lines;
         }
+    }
+
+    private static DateTime _protectionSuspendedUntilUtc = DateTime.MinValue;
+
+    /// <summary>
+    /// true enquanto a proteção do hosts está SUSPENSA (rodada 2026-11-19): o autoteste de ponta a ponta do DNS
+    /// (<see cref="DnsFilterController"/>) viu que o Windows não resolve sites mesmo com a internet de pé, e o arquivo hosts protegido é
+    /// um dos suspeitos. Disponibilidade vence: nesse caso a proteção fica de fora por um tempo em vez de deixar o PC sem sites.
+    /// </summary>
+    public static bool IsProtectionSuspended => DateTime.UtcNow < _protectionSuspendedUntilUtc;
+
+    /// <summary>Tira a proteção do hosts e não a recoloca por <paramref name="duration"/>. Nunca lança.</summary>
+    public static void SuspendProtection(TimeSpan duration, string why)
+    {
+        try
+        {
+            _protectionSuspendedUntilUtc = DateTime.UtcNow + duration;
+            Logger.Log($"hosts: proteção SUSPENSA por {(int)duration.TotalMinutes} min ({why}).");
+            WithHostsLock(UnprotectInternal);
+        }
+        catch (Exception ex) { Logger.LogException("HostsFileManager.SuspendProtection", ex); }
+    }
+
+    /// <summary>Grava agora (sem o limite de 10 min) a linha com conta, atributos, dono e ACL do hosts.</summary>
+    internal static void LogHostsStateNow()
+    {
+        _lastStateLogUtc = DateTime.MinValue;
+        LogHostsStateThrottled();
     }
 
     private static DateTime _lastStateLogUtc = DateTime.MinValue;

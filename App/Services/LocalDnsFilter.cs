@@ -394,7 +394,10 @@ public sealed class LocalDnsFilter : IDisposable
     /// Pergunta <paramref name="name"/> (tipo A) ao próprio filtro em 127.0.0.1:53. true se houve resposta com
     /// RCODE 0 dentro do prazo, ou seja: o filtro escuta E o servidor de cima responde.
     /// </summary>
-    public static bool Probe(string name, int timeoutMs = 3000)
+    public static bool Probe(string name, int timeoutMs = 3000) => ProbeServer(IPAddress.Loopback, name, timeoutMs);
+
+    /// <summary>Igual a <see cref="Probe"/>, mas pergunta a OUTRO servidor (ex.: o de cima), para saber se a internet está de pé.</summary>
+    public static bool ProbeServer(IPAddress server, string name, int timeoutMs = 3000)
     {
         try
         {
@@ -402,7 +405,7 @@ public sealed class LocalDnsFilter : IDisposable
             udp.Client.ReceiveTimeout = timeoutMs;
             udp.Client.SendTimeout = timeoutMs;
             var query = DnsFilterCore.BuildQuery(name);
-            udp.Send(query, query.Length, new IPEndPoint(IPAddress.Loopback, 53));
+            udp.Send(query, query.Length, new IPEndPoint(server, 53));
 
             var remote = new IPEndPoint(IPAddress.Any, 0);
             var reply = udp.Receive(ref remote);

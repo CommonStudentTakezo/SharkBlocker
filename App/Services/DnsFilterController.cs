@@ -126,9 +126,83 @@ public static class DnsFilterController
 
     // ---------------------------------------------------------------- ciclo
 
+    // ---------------------------------------------------------------- autoteste de PONTA A PONTA (rodada 2026-11-19)
+    // O autoteste antigo só pergunta ao filtro em 127.0.0.1. Se o Windows não consegue resolver sites por OUTRO motivo (hosts ilegível
+    // para o Cliente DNS, cache negativo, DNS órfão em outro adaptador...), ele passava e o PC ficava com DNS_PROBE_FINISHED_NXDOMAIN
+    // até o emergency-fix-hosts.bat. Aqui se pergunta ao resolvedor do PRÓPRIO Windows (o que os navegadores usam).
+
+    private static DateTime _lastSystemProbeUtc = DateTime.MinValue;
+    private static DateTime _systemHealCooldownUtc = DateTime.MinValue;
+    private static int _systemFailures;
+    private static readonly TimeSpan SystemProbeEvery = TimeSpan.FromSeconds(30);
+
+    [System.Runtime.InteropServices.DllImport("dnsapi.dll", EntryPoint = "DnsFlushResolverCache")]
+    private static extern bool DnsFlushResolverCache();
+
+    /// <summary>true se o resolvedor do Windows resolve um nome que sempre existe. Esvazia o cache antes (cache positivo mascara a falha).</summary>
+    private static bool SystemResolverWorks(out string detail)
+    {
+        try { DnsFlushResolverCache(); } catch { /* sem a API: testa mesmo assim */ }
+        detail = "";
+        foreach (var host in new[] { "dns.msftncsi.com", "www.microsoft.com" })
+        {
+            try
+            {
+                var task = Dns.GetHostAddressesAsync(host);
+                if (!task.Wait(4000)) { detail = $"{host}: sem resposta em 4 s"; continue; }
+                if (task.Result.Length > 0) return true;
+                detail = $"{host}: resposta vazia";
+            }
+            catch (AggregateException ex)
+            {
+                var inner = ex.InnerException;
+                detail = $"{host}: {inner?.GetType().Name}" +
+                         (inner is System.Net.Sockets.SocketException se ? $" ({se.SocketErrorCode})" : "");
+            }
+            catch (Exception ex) { detail = $"{host}: {ex.GetType().Name}"; }
+        }
+        return false;
+    }
+
+    private static bool InternetReachable() =>
+        Upstreams.Any(u => LocalDnsFilter.ProbeServer(u, "cloudflare.com", 2500));
+
+    private static IEnumerable<IPAddress> Upstreams => LocalDnsFilter.Upstreams;
+
+    private static void CheckSystemResolver(DateTime now)
+    {
+        if (now - _lastSystemProbeUtc < SystemProbeEvery) return;
+        _lastSystemProbeUtc = now;
+
+        if (SystemResolverWorks(out var detail)) { _systemFailures = 0; return; }
+        if (!InternetReachable()) { _systemFailures = 0; return; } // sem internet de verdade: não é culpa do DNS/hosts
+        if (++_systemFailures < 2 || now < _systemHealCooldownUtc) return;
+
+        _systemFailures = 0;
+        _systemHealCooldownUtc = now.AddMinutes(10);
+        Logger.Log($"DNS de ponta a ponta: a internet está de pé (o servidor de cima responde), mas o Windows NÃO resolve sites ({detail}). Reparando: DNS volta ao normal, proteção do hosts suspensa por 30 min e cache de DNS limpo.");
+        try { HostsFileManager.LogHostsStateNow(); } catch { }
+
+        // 1) filtro de DNS fora do caminho (fail-open) e sem nova tentativa por 10 min
+        if (_filter != null || _applied || File.Exists(BackupFile)) Deactivate("o Windows não resolve sites (autoteste de ponta a ponta)");
+        else if (AnyAdapterPointsToFilter()) { RemoveFirewall(deep: false); RunPowerShell(RestoreScript()); }
+        _nextAttemptUtc = now.AddMinutes(10);
+
+        // 2) hosts sem a proteção (leitura/escrita normais) por um tempo
+        HostsFileManager.SuspendProtection(TimeSpan.FromMinutes(30), "o Windows não resolvia sites com a internet de pé");
+
+        // 3) confere o resultado, para o log dizer se o reparo funcionou
+        var ok = SystemResolverWorks(out var after);
+        Logger.Log(ok
+            ? "DNS de ponta a ponta: o Windows voltou a resolver sites depois do reparo."
+            : $"DNS de ponta a ponta: AINDA não resolve depois do reparo ({after}). A causa é outra: rode diagnostico-dns.ps1 e envie o relatório.");
+    }
+
     private static void TickCore(BlockState state)
     {
         var now = DateTime.UtcNow;
+
+        CheckSystemResolver(now);
 
         if (!WantsFilter(state))
         {
