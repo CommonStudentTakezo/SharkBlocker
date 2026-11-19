@@ -88,7 +88,7 @@ public static class DnsFilterController
                 lock (Gate) { TickCore(state); }
             }
             catch (Exception ex) { Logger.LogException("DnsFilterController.Tick", ex); }
-            finally { Volatile.Write(ref _busy, 0); }
+            finally { _lastTickUtc = DateTime.UtcNow; Volatile.Write(ref _busy, 0); }
         });
     }
 
@@ -207,8 +207,7 @@ public static class DnsFilterController
 
     private static void DetectResume(DateTime now)
     {
-        var gap = _lastTickUtc == DateTime.MinValue ? TimeSpan.Zero : now - _lastTickUtc;
-        _lastTickUtc = now;
+        var gap = _lastTickUtc == DateTime.MinValue ? TimeSpan.Zero : now - _lastTickUtc; // _lastTickUtc = FIM do ciclo anterior (ver Tick)
         if (gap < TimeSpan.FromSeconds(45)) return;
 
         Logger.Log($"Filtro de DNS: o PC voltou de suspensão/hibernação (ciclo parado por {(int)gap.TotalSeconds} s). Reiniciando o filtro e limpando o cache de DNS.");
@@ -221,7 +220,7 @@ public static class DnsFilterController
             _nextAttemptUtc = DateTime.MinValue;
         }
         _resumeWatchUntilUtc = now.AddMinutes(3);
-        _lastSystemProbeUtc = DateTime.MinValue;
+        _lastSystemProbeUtc = now.AddSeconds(10); // 1º teste do resolvedor só depois de o filtro novo subir (evita falso alarme)
         _systemFailures = 0;
     }
 
