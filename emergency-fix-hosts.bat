@@ -3,6 +3,9 @@ REM emergency-fix-hosts.bat
 REM Rode este arquivo como Administrador (botao direito > Executar como administrador)
 REM se o PC ficou sem acessar sites depois de testar o SharkBlocker.
 
+echo ATENCAO: este arquivo FECHA o SharkBlocker e PARA o Watchdog (a protecao fica desligada). Se o problema for so "sem sites", feche esta janela e rode corrigir-dns.bat, que nao derruba nada.
+echo Pressione uma tecla para continuar mesmo assim, ou feche a janela para cancelar.
+pause
 echo Restaurando permissoes do arquivo hosts...
 
 REM Remove os atributos que travavam o arquivo

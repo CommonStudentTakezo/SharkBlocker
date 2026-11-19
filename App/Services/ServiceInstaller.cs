@@ -369,6 +369,13 @@ public static class ServiceInstaller
     /// <summary>Lê o caminho do executável configurado no serviço registrado (ou null se não achar).</summary>
     public static string? GetConfiguredBinPath()
     {
+        // CAUSA (log de 2026-11-19): a leitura abaixo procura "BINARY_PATH_NAME" na saída do "sc qc", mas no Windows em português o rótulo é
+        // traduzido ("NOME_DO_CAMINHO_BINÁRIO") e ainda sai em página de código OEM. A busca nunca achava nada, "alreadyGood" era sempre falso e
+        // TODA abertura do app matava o Watchdog e recriava o serviço (deixando o DNS/hosts sem guarda e o serviço "marcado para exclusão").
+        // O registro não depende de idioma: HKLM\SYSTEM\CurrentControlSet\Services\<serviço>\ImagePath.
+        var fromRegistry = ParseImagePath(ReadImagePathFromRegistry());
+        if (fromRegistry != null) return fromRegistry;
+
         var psi = new ProcessStartInfo("sc", $"qc {ServiceName}")
         {
             CreateNoWindow = true,
@@ -403,6 +410,30 @@ public static class ServiceInstaller
             System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
         return match.Success ? match.Groups[1].Value.Trim() : null;
+    }
+
+    private static string? ReadImagePathFromRegistry()
+    {
+        try
+        {
+            using var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\" + ServiceName);
+            return key?.GetValue("ImagePath") as string;
+        }
+        catch { return null; }
+    }
+
+    /// <summary>"C:\a b\Watchdog.exe" --x  ou  C:\a\Watchdog.exe --x  ->  caminho do executável (sem aspas nem argumentos). Puro, testável.</summary>
+    internal static string? ParseImagePath(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var s = raw.Trim();
+        if (s.StartsWith('"'))
+        {
+            var end = s.IndexOf('"', 1);
+            return end > 1 ? s[1..end] : null;
+        }
+        var exe = s.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+        return exe > 0 ? s[..(exe + 4)] : s;
     }
 
     private static void RunSc(string arguments)

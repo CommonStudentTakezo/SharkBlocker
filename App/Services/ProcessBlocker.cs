@@ -114,6 +114,10 @@ public static class ProcessBlocker
     private static readonly string[] SuspiciousPathKeywords = new[]
     {
         "tor browser",
+        // Instaladores e pastas do Tor Browser usam hífen/sublinhado/junto ("tor-browser-windows-...", "torbrowser-install-...").
+        "tor-browser",
+        "tor_browser",
+        "torbrowser",
         "duckduckgo",
         "epic privacy",
         "openvpn",

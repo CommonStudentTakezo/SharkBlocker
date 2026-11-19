@@ -171,7 +171,8 @@ public static class DnsFilterController
 
     private static void CheckSystemResolver(DateTime now)
     {
-        if (now - _lastSystemProbeUtc < SystemProbeEvery) return;
+        var every = now < _resumeWatchUntilUtc ? TimeSpan.FromSeconds(5) : SystemProbeEvery;
+        if (now - _lastSystemProbeUtc < every) return;
         _lastSystemProbeUtc = now;
 
         if (SystemResolverWorks(out var detail)) { _systemFailures = 0; return; }
@@ -198,10 +199,37 @@ public static class DnsFilterController
             : $"DNS de ponta a ponta: AINDA não resolve depois do reparo ({after}). A causa é outra: rode diagnostico-dns.ps1 e envie o relatório.");
     }
 
+    // Retomada após suspensão/hibernação (rodada 2026-11-19): o Watchdog roda a cada ~5 s; um intervalo bem maior entre dois ciclos
+    // significa que o PC dormiu. Ao acordar a rede ainda não voltou e os soquetes do filtro podem estar mortos: reinicia o filtro,
+    // limpa o cache de DNS e checa o resolvedor do Windows a cada ciclo por 3 min (em vez de a cada 30 s).
+    private static DateTime _lastTickUtc = DateTime.MinValue;
+    private static DateTime _resumeWatchUntilUtc = DateTime.MinValue;
+
+    private static void DetectResume(DateTime now)
+    {
+        var gap = _lastTickUtc == DateTime.MinValue ? TimeSpan.Zero : now - _lastTickUtc;
+        _lastTickUtc = now;
+        if (gap < TimeSpan.FromSeconds(45)) return;
+
+        Logger.Log($"Filtro de DNS: o PC voltou de suspensão/hibernação (ciclo parado por {(int)gap.TotalSeconds} s). Reiniciando o filtro e limpando o cache de DNS.");
+        try { DnsFlushResolverCache(); } catch { }
+        if (_filter != null)
+        {
+            // Soquetes antigos podem estar mortos: derruba só o filtro em memória; o ciclo seguinte sobe um novo e refaz o autoteste.
+            try { _filter.Dispose(); } catch { }
+            _filter = null;
+            _nextAttemptUtc = DateTime.MinValue;
+        }
+        _resumeWatchUntilUtc = now.AddMinutes(3);
+        _lastSystemProbeUtc = DateTime.MinValue;
+        _systemFailures = 0;
+    }
+
     private static void TickCore(BlockState state)
     {
         var now = DateTime.UtcNow;
 
+        DetectResume(now);
         CheckSystemResolver(now);
 
         if (!WantsFilter(state))
@@ -320,7 +348,7 @@ public static class DnsFilterController
         if (now - _lastOrphanCheckUtc < TimeSpan.FromSeconds(30)) return;
         _lastOrphanCheckUtc = now;
         if (!AnyAdapterPointsToFilter()) return;
-        if (LocalDnsFilter.Probe("cloudflare.com", 2000)) return;
+        if (LocalDnsFilter.Probe("cloudflare.com", 2000) || LocalDnsFilter.SomeoneListens()) return;
         Logger.Log($"Filtro de DNS: o DNS do Windows aponta para 127.0.0.1/::1, mas o filtro não está atendendo ({why}). Devolvendo o DNS ao normal (fail-open).");
         RemoveFirewall(deep: false);
         RunPowerShell(RestoreScript());
@@ -342,7 +370,7 @@ public static class DnsFilterController
             {
                 if (_filter != null) return false;
                 var points = AnyAdapterPointsToFilter();
-                if (points && LocalDnsFilter.Probe("cloudflare.com", 2000)) return false;
+                if (points && (LocalDnsFilter.Probe("cloudflare.com", 2000) || LocalDnsFilter.SomeoneListens())) return false;
                 if (!points && (!File.Exists(BackupFile) || System.Diagnostics.Process.GetProcessesByName("Watchdog").Length > 0)) return false;
                 Logger.Log($"Filtro de DNS: DNS órfão detectado ({why}): {(points ? "o Windows aponta para 127.0.0.1/::1 e ninguém atende" : "sobrou o backup do DNS")}. Devolvendo o DNS ao normal.");
                 RemoveFirewall(deep: true);

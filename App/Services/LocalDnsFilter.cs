@@ -417,6 +417,28 @@ public sealed class LocalDnsFilter : IDisposable
         }
     }
 
+    /// <summary>
+    /// true se ALGO escuta em 127.0.0.1:53 (respondeu, ou ficou calado sem recusar). false só quando o Windows recusa na hora (UDP
+    /// "porta inacessível" = ninguém escuta). Diferente de <see cref="Probe"/>, não exige que o servidor de cima também responda:
+    /// logo depois de acordar do suspenso a rede ainda não voltou e o Probe falhava, e o app "consertava" um DNS que não estava órfão.
+    /// </summary>
+    public static bool SomeoneListens(int timeoutMs = 1500)
+    {
+        try
+        {
+            using var udp = new UdpClient(AddressFamily.InterNetwork);
+            udp.Client.ReceiveTimeout = timeoutMs;
+            var query = DnsFilterCore.BuildQuery("cloudflare.com");
+            udp.Send(query, query.Length, new IPEndPoint(IPAddress.Loopback, 53));
+            var remote = new IPEndPoint(IPAddress.Any, 0);
+            udp.Receive(ref remote);
+            return true;
+        }
+        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.ConnectionReset) { return false; }
+        catch (SocketException ex) when (ex.SocketErrorCode == SocketError.TimedOut) { return true; }
+        catch { return true; } // dúvida: não finge que ninguém escuta (evita mexer no DNS à toa)
+    }
+
     public void Dispose()
     {
         if (_disposed) return;
